@@ -6,4 +6,4 @@ requests
 Pillow
 cloudscraper
 aiohttp
-curl-cffi
+tls_client
