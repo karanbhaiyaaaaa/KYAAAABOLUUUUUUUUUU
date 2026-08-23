@@ -4,7 +4,6 @@ certifi
 qrcode
 requests
 Pillow
-
 cloudscraper
-
 aiohttp
+curl-cffi
