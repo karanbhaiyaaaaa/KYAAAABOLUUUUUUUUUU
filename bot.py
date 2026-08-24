@@ -30,7 +30,7 @@ from telegram.ext import (
 from telegram.request import HTTPXRequest
 
 # ============================================
-# âœ… CONFIG
+# ✅ CONFIG
 # ============================================
 
 TOKEN = "8938025980:AAFccNOWs7akhs0_CTHB7yJ980Utj0ODsyc"
@@ -52,7 +52,7 @@ MASTER_KEY = "a7f3e8b2c9d1f4a6b8c2d5e9f1a3b6c8"
 ANDROID_ID = "0b9b969bc2e7997b"
 
 # ============================================
-# ðŸŽ¯ BALA MOD PRODUCTS - Android ID Required
+# 🎯 BALA MOD PRODUCTS - Android ID Required
 # ============================================
 
 BALA_MOD_PRODUCTS = [
@@ -60,7 +60,7 @@ BALA_MOD_PRODUCTS = [
 ]
 
 # ============================================
-# ðŸŽ¯ PREMIUM EMOJI IDs - ONLY FOR BUTTONS
+# 🎯 PREMIUM EMOJI IDs - ONLY FOR BUTTONS
 # ============================================
 
 
@@ -90,7 +90,7 @@ def notify_admin_deposit(user_id, order_id, amount, utr, sender):
     try:
         user_data = db.get_user(user_id)
         username = f"@{user_data[1]}" if user_data and user_data[1] else user_id
-        admin_msg = f"ðŸŒŸ <b>NEW DEPOSIT RECEIVED!</b>\n\nðŸ‘¤ <b>User:</b> {username} (<code>{user_id}</code>)\n<tg-emoji emoji-id=\"6215156189454409086\">ðŸ’°</tg-emoji> <b>Amount:</b> â‚¹{amount:.2f}\nâ° <b>Time:</b> {datetime.now().strftime('%d-%m-%Y %I:%M %p')}\n<tg-emoji emoji-id=\"5334890573281114250\">ðŸ†”</tg-emoji> <b>Order ID:</b> <code>{order_id}</code>"
+        admin_msg = f"🌟 <b>NEW DEPOSIT RECEIVED!</b>\n\n👤 <b>User:</b> {username} (<code>{user_id}</code>)\n<tg-emoji emoji-id=\"6215156189454409086\">💰</tg-emoji> <b>Amount:</b> ₹{amount:.2f}\n⏰ <b>Time:</b> {datetime.now().strftime('%d-%m-%Y %I:%M %p')}\n<tg-emoji emoji-id=\"5334890573281114250\">🆔</tg-emoji> <b>Order ID:</b> <code>{order_id}</code>"
         requests.post(
             f"https://api.telegram.org/bot{TOKEN}/sendMessage",
             json={"chat_id": int(ADMIN_ID), "text": admin_msg, "parse_mode": "HTML"},
@@ -133,7 +133,7 @@ BUTTON_EMOJIS = {
 }
 
 # ============================================
-# ðŸŽ¨ EMOJI HELPERS
+# 🎨 EMOJI HELPERS
 # ============================================
 
 def get_button_emoji(name):
@@ -186,7 +186,7 @@ def parse_product_line(text):
     }
 
 # ============================================
-# ðŸŽ¨ STYLED BUTTON
+# 🎨 STYLED BUTTON
 # ============================================
 
 class ColoredButton(InlineKeyboardButton):
@@ -256,7 +256,7 @@ def decode_cb(data):
     return data.split(SEP)
 
 logging.basicConfig(
-    format='%(asctime)s â”‚ %(levelname)-8s â”‚ %(name)s â”‚ %(message)s',
+    format='%(asctime)s │ %(levelname)-8s │ %(name)s │ %(message)s',
     datefmt='%d-%m-%Y %H:%M:%S',
     level=logging.INFO,
     handlers=[
@@ -269,7 +269,7 @@ logging.getLogger("httpcore").setLevel(logging.WARNING)
 logger = logging.getLogger("KaranPayBot")
 
 # ============================================
-# ðŸŽ² RANDOM AMOUNT GENERATOR
+# 🎲 RANDOM AMOUNT GENERATOR
 # ============================================
 
 def generate_random_amount(base_amount):
@@ -297,7 +297,7 @@ class Database:
         )
         self.db = self.client["karanpay_bot"]
         self.settings_cache = {}
-        logger.info("ðŸ—„ï¸ MongoDB Database ready!")
+        logger.info("🗄️ MongoDB Database ready!")
 
     def get_setting(self, key):
         if key in self.settings_cache:
@@ -660,7 +660,7 @@ db = Database()
 db.init_products()
 
 # ============================================
-# ðŸ’³ KARANPAY PAYMENT GATEWAY
+# 💳 KARANPAY PAYMENT GATEWAY
 # ============================================
 
 def get_karanpay_key(order_id):
@@ -681,28 +681,28 @@ def create_karanpay_order(amount, order_id, customer_name):
         "X-Guru-Key": key,
         "Content-Type": "application/json"
     }
-    logger.info(f"ðŸ“¤ Creating KaranPay order â†’ {order_id} | â‚¹{amount} | {customer_name}")
+    logger.info(f"📤 Creating KaranPay order → {order_id} | ₹{amount} | {customer_name}")
     try:
         resp = requests.post(KARANPAY_CREATE_URL, json=payload, headers=headers, timeout=20)
         data = resp.json()
         if data.get("status") == "success":
             payment_url = data.get("data", {}).get("payment_url") or data.get("payment_url")
             if payment_url:
-                logger.info(f"ðŸ”— Order {order_id} created â†’ {payment_url}")
+                logger.info(f"🔗 Order {order_id} created → {payment_url}")
                 upi_url = payment_url
                 try:
                     html_resp = requests.get(payment_url, timeout=10).text
                     matches = re.findall(r'upi://pay\?[^\"\'<>]+', html_resp)
                     if matches:
                         upi_url = matches[0].replace("&amp;", "&")
-                        logger.info(f"âœ… Extracted UPI Intent: {upi_url}")
+                        logger.info(f"✅ Extracted UPI Intent: {upi_url}")
                 except Exception as ex:
                     logger.error(f"Failed to extract UPI intent: {ex}")
                 return payment_url, upi_url, None
-        logger.warning(f"âš ï¸ KaranPay create-order failed for {order_id}: {data}")
+        logger.warning(f"⚠️ KaranPay create-order failed for {order_id}: {data}")
         return None, None, data.get("message") or "Order create nahi ho paaya."
     except Exception as e:
-        logger.error(f"âŒ KaranPay create-order error for {order_id}: {e}")
+        logger.error(f"❌ KaranPay create-order error for {order_id}: {e}")
         return None, None, str(e)
 
 
@@ -718,11 +718,11 @@ def check_karanpay_status(order_id):
         if data.get("status") == "success":
             d = data.get("data", {})
             if d.get("payment_status") == "success":
-                logger.info(f"ðŸ’° Payment CONFIRMED for {order_id} | UTR: {d.get('utr', 'N/A')} | â‚¹{d.get('amount')}")
+                logger.info(f"💰 Payment CONFIRMED for {order_id} | UTR: {d.get('utr', 'N/A')} | ₹{d.get('amount')}")
                 return d
         return None
     except Exception as e:
-        logger.error(f"âŒ KaranPay check-status error for {order_id}: {e}")
+        logger.error(f"❌ KaranPay check-status error for {order_id}: {e}")
         return None
 
 
@@ -744,60 +744,59 @@ def generate_qr_image(data_str):
 def generate_ref_code():
     return "DBX-" + "".join(random.choices(string.ascii_uppercase + string.digits, k=8))
 
-import cloudscraper
-global_scraper = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'desktop': True})
-
 def fetch_license_key(product_id, duration, android_id=ANDROID_ID):
     payload = {
-        'api_key': API_KEY,
-        'action': 'buy',
-        'product_id': str(product_id),
-        'duration': str(duration),
-        'android_id': android_id
+        \'api_key\': API_KEY,
+        \'action\': \'buy\',
+        \'product_id\': str(product_id),
+        \'duration\': str(duration),
+        \'android_id\': android_id
     }
     headers = {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'x-master-key': MASTER_KEY
+        \'Content-Type\': \'application/x-www-form-urlencoded\',
+        \'x-master-key\': MASTER_KEY
     }
+    
+    # Yahan humne proxy API set kar di hai jo Cloudflare bypass karegi
+    SCRAPER_API_KEY = "d236632ead5ec3f5fc4466ac4394189f"
+    proxy_url = f"http://api.scraperapi.com?api_key={SCRAPER_API_KEY}&url={API_ENDPOINT}&keep_headers=true"
+
     try:
-        import tls_client
-        session = tls_client.Session(client_identifier="chrome_112")
-        response = session.post(API_ENDPOINT, data=payload, headers=headers, timeout_seconds=15)
-        logger.info(f"API Response: {response.text}")
+        import requests
+        logger.info("Sending request via ScraperAPI Proxy...")
+        resp = requests.post(proxy_url, data=payload, headers=headers, timeout=40)
+        res_text = resp.text
+        
+        logger.info(f"Proxy API Response: {res_text}")
         
         try:
-            res_data = response.json()
+            import json
+            res_data = json.loads(res_text)
             if isinstance(res_data, dict):
-                if "key" in res_data:
-                    return res_data["key"]
-                if "license" in res_data:
-                    return res_data["license"]
-                if "message" in res_data:
-                    return f"Error: {res_data['message']}"
-                if "msg" in res_data:
-                    return f"Error: {res_data['msg']}"
-                return f"Error: {str(res_data)}"
+                if "key" in res_data: return res_data["key"]
+                if "license" in res_data: return res_data["license"]
+                if "message" in res_data: return f"Error: {res_data[\'message\']}"
+                if "msg" in res_data: return f"Error: {res_data[\'msg\']}"
         except:
             pass
         
-        if response.status_code != 200:
-            return f"Error: API HTTP {response.status_code}"
+        if resp.status_code != 200:
+            return f"Error: API HTTP {resp.status_code} - {res_text[:50]}"
             
-        text_resp = response.text.strip()
-        if "<!DOCTYPE" in text_resp.upper() or "<HTML" in text_resp.upper():
-            return "Error: API is down (Returned HTML page)"
+        if "<!DOCTYPE" in res_text.upper() or "<HTML" in res_text.upper():
+            return "Error: Proxy API blocked by Cloudflare (Render logs dekho)"
             
-        if text_resp and "Error" not in text_resp:
-            return text_resp
+        if res_text and "Error" not in res_text:
+            return res_text
+            
+        return f"Error: {res_text}"
         
-        return f"Error: Unknown response"
-            
     except Exception as e:
-        logger.error(f"API Request Failed: {e}")
-        return f"Error: {str(e)}"
+        logger.error(f"Proxy request failed: {e}")
+        return f"Error: Proxy connection failed! {str(e)}"
 
 # ============================================
-# ðŸ’³ AUTO-PAYMENT MONITOR (KaranPay)
+# 💳 AUTO-PAYMENT MONITOR (KaranPay)
 # ============================================
 
 class KaranPayMonitor:
@@ -811,7 +810,7 @@ class KaranPayMonitor:
         self.running = True
         self.thread = threading.Thread(target=self._monitor, daemon=True)
         self.thread.start()
-        logger.info("ðŸŸ¢ KaranPay auto-payment monitor started!")
+        logger.info("🟢 KaranPay auto-payment monitor started!")
 
     def stop(self):
         self.running = False
@@ -821,7 +820,7 @@ class KaranPayMonitor:
             try:
                 self._check_pending_orders()
             except Exception as e:
-                logger.error(f"âš ï¸ Monitor error: {e}")
+                logger.error(f"⚠️ Monitor error: {e}")
             time.sleep(10)
 
     def _check_pending_orders(self):
@@ -838,7 +837,7 @@ class KaranPayMonitor:
             if self.db.complete_order_atomic(order_id, utr, sender):
                 self.db.update_balance(user_id, paid_amount)
                 self.db.add_deposit_history(user_id, order_id, paid_amount, utr, sender)
-                logger.info(f"âœ… Order {order_id} COMPLETED via KaranPay! (User: {user_id}, â‚¹{paid_amount})")
+                logger.info(f"✅ Order {order_id} COMPLETED via KaranPay! (User: {user_id}, ₹{paid_amount})")
 
                 try:
                     self._send_user_success(user_id, order_id, paid_amount, utr, sender)
@@ -848,22 +847,22 @@ class KaranPayMonitor:
 
     def _send_user_success(self, user_id, order_id, amount, utr, sender):
         default_msg = f"""<blockquote>
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
-<tg-emoji emoji-id="6235234890980269200">âœ…</tg-emoji> <b>PAYMENT VERIFIED SUCCESSFULLY</b>
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+━━━━━━━━━━━━━━━━━━━━
+<tg-emoji emoji-id="6235234890980269200">✅</tg-emoji> <b>PAYMENT VERIFIED SUCCESSFULLY</b>
+━━━━━━━━━━━━━━━━━━━━
 
 Your payment has been successfully verified and instantly processed by our system.
 
 <b>Transaction Details:</b>
-<tg-emoji emoji-id="5334890573281114250">ðŸ†”</tg-emoji> <b>Order ID:</b> <code>{{order_id}}</code>
-<tg-emoji emoji-id="6156533171513986360">ðŸ’°</tg-emoji> <b>Amount Paid:</b> â‚¹{{amount:.2f}}
-<tg-emoji emoji-id="6034969813032374911">ðŸ§¾</tg-emoji> <b>UTR / Ref No:</b> <code>{{utr}}</code>
-<tg-emoji emoji-id="6276133811545706331">ðŸ‘¤</tg-emoji> <b>Payer Name:</b> {{sender}}
+<tg-emoji emoji-id="5334890573281114250">🆔</tg-emoji> <b>Order ID:</b> <code>{{order_id}}</code>
+<tg-emoji emoji-id="6156533171513986360">💰</tg-emoji> <b>Amount Paid:</b> ₹{{amount:.2f}}
+<tg-emoji emoji-id="6034969813032374911">🧾</tg-emoji> <b>UTR / Ref No:</b> <code>{{utr}}</code>
+<tg-emoji emoji-id="6276133811545706331">👤</tg-emoji> <b>Payer Name:</b> {{sender}}
 
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
-<tg-emoji emoji-id="6033106828018062225">ðŸ’¸</tg-emoji> <b>â‚¹{{amount:.2f}}</b> has been added to your wallet balance!
+━━━━━━━━━━━━━━━━━━━━
+<tg-emoji emoji-id="6033106828018062225">💸</tg-emoji> <b>₹{{amount:.2f}}</b> has been added to your wallet balance!
 You can now proceed to purchase your desired products from the Store.
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+━━━━━━━━━━━━━━━━━━━━
 </blockquote>"""
         msg = get_text_safe("add_success_msg", default_msg).format(
             order_id=order_id, amount=amount, utr=utr, sender=sender
@@ -886,11 +885,11 @@ You can now proceed to purchase your desired products from the Store.
                 return
             bonus = self.db.credit_referral_bonus(referrer_id, referred_user_id, deposit_amount, REFERRAL_COMMISSION_PERCENT)
             if bonus and bonus > 0:
-                logger.info(f"ðŸŽ Referral bonus: â‚¹{bonus:.2f} â†’ {referrer_id} (from {referred_user_id}'s â‚¹{deposit_amount:.2f} deposit)")
+                logger.info(f"🎁 Referral bonus: ₹{bonus:.2f} → {referrer_id} (from {referred_user_id}'s ₹{deposit_amount:.2f} deposit)")
                 msg = (
-                    f'<tg-emoji emoji-id="6242389503336518600">ðŸŽ‰</tg-emoji> <b>REFERRAL BONUS!</b>\n\n'
-                    f"Aapke referral se ek user ne â‚¹{deposit_amount:.2f} deposit kiya.\n"
-                    f'<tg-emoji emoji-id="6033106828018062225">ðŸ’°</tg-emoji> <b>â‚¹{bonus:.2f}</b> aapke wallet mein add ho gaye!'
+                    f'<tg-emoji emoji-id="6242389503336518600">🎉</tg-emoji> <b>REFERRAL BONUS!</b>\n\n'
+                    f"Aapke referral se ek user ne ₹{deposit_amount:.2f} deposit kiya.\n"
+                    f'<tg-emoji emoji-id="6033106828018062225">💰</tg-emoji> <b>₹{bonus:.2f}</b> aapke wallet mein add ho gaye!'
                 )
                 try:
                     requests.post(
@@ -904,7 +903,7 @@ You can now proceed to purchase your desired products from the Store.
             logger.warning(f"Referral credit failed: {e}")
 
 # ============================================
-# ðŸ”µ KEYBOARDS - ONLY PREMIUM EMOJIS IN BUTTONS
+# 🔵 KEYBOARDS - ONLY PREMIUM EMOJIS IN BUTTONS
 # ============================================
 
 def get_main_menu_keyboard(is_admin=False):
@@ -1013,7 +1012,7 @@ def get_back_button():
     ])
 
 # ============================================
-# ðŸ“± ANDROID ID HANDLERS - NEW
+# 📱 ANDROID ID HANDLERS - NEW
 # ============================================
 
 async def ask_android_id(update: Update, context: ContextTypes.DEFAULT_TYPE, product_data):
@@ -1025,33 +1024,33 @@ async def ask_android_id(update: Update, context: ContextTypes.DEFAULT_TYPE, pro
     context.user_data["awaiting_android_id"] = True
     
     text = f"""
-ðŸ” <b>ANDROID ID REQUIRED</b>
+🔐 <b>ANDROID ID REQUIRED</b>
 
-ðŸ›ï¸ <b>Product:</b> {product_data['name']}
-â³ <b>Plan:</b> {product_data['plan']}
-ðŸ’Ž <b>Price:</b> â‚¹{product_data['price']}
+🛍️ <b>Product:</b> {product_data['name']}
+⏳ <b>Plan:</b> {product_data['plan']}
+💎 <b>Price:</b> ₹{product_data['price']}
 
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+━━━━━━━━━━━━━━━━━━━━━
 
-âš ï¸ <b>BALA MOD requires your Android ID</b>
+⚠️ <b>BALA MOD requires your Android ID</b>
 
-ðŸ“± <b>How to get Android ID:</b>
-1ï¸âƒ£ Open your Free Fire app
-2ï¸âƒ£ Go to Settings â†’ About
-3ï¸âƒ£ Copy your Android Device ID
+📱 <b>How to get Android ID:</b>
+1️⃣ Open your Free Fire app
+2️⃣ Go to Settings → About
+3️⃣ Copy your Android Device ID
 
 OR use any Android ID finder app.
 
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+━━━━━━━━━━━━━━━━━━━━━
 
-âœï¸ <b>Send your Android ID now:</b>
+✏️ <b>Send your Android ID now:</b>
 <code>Example: 0b9b969bc2e7997b</code>
 
 Type <b>/cancel</b> to cancel purchase.
 """
     
     keyboard = [
-        [CB("âŒ Cancel", style="danger", icon=get_button_emoji("cancel"), callback_data="cancel_purchase")]
+        [CB("❌ Cancel", style="danger", icon=get_button_emoji("cancel"), callback_data="cancel_purchase")]
     ]
     
     await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
@@ -1066,16 +1065,16 @@ async def handle_user_message(update: Update, context: ContextTypes.DEFAULT_TYPE
         context.user_data["awaiting_transfer_userid"] = False
         context.user_data["awaiting_transfer_amount"] = False
         context.user_data["pending_product"] = None
-        await update.message.reply_text("âŒ Action cancelled.")
+        await update.message.reply_text("❌ Action cancelled.")
         return
 
     if context.user_data.get("awaiting_android_id"):
         if not re.match(r'^[0-9a-fA-F]{16}$', text_input):
-            await update.message.reply_text("âŒ <b>Invalid Android ID!</b>\nAndroid ID should be 16 characters (hex).\nExample: <code>0b9b969bc2e7997b</code>\nPlease send again or type /cancel", parse_mode="HTML")
+            await update.message.reply_text("❌ <b>Invalid Android ID!</b>\nAndroid ID should be 16 characters (hex).\nExample: <code>0b9b969bc2e7997b</code>\nPlease send again or type /cancel", parse_mode="HTML")
             return
         product_data = context.user_data.get("pending_product")
         if not product_data:
-            await update.message.reply_text("âŒ Session expired. Please start again.")
+            await update.message.reply_text("❌ Session expired. Please start again.")
             return
         context.user_data["awaiting_android_id"] = False
         context.user_data["pending_product"] = None
@@ -1090,16 +1089,16 @@ async def handle_user_message(update: Update, context: ContextTypes.DEFAULT_TYPE
             user_doc = db.db.users.find_one({"username": {"$regex": f"^{clean_username}$", "$options": "i"}})
             target_user = (user_doc["user_id"], user_doc.get("username")) if user_doc else None
         else:
-            await update.message.reply_text("âŒ Invalid Input. Must be a User ID or @username. Type /cancel to abort.")
+            await update.message.reply_text("❌ Invalid Input. Must be a User ID or @username. Type /cancel to abort.")
             return
 
         if not target_user:
-            await update.message.reply_text("âŒ User not found! Please check the ID/Username and try again, or type /cancel.")
+            await update.message.reply_text("❌ User not found! Please check the ID/Username and try again, or type /cancel.")
             return
             
         target_id = str(target_user[0])
         if target_id == user_id:
-            await update.message.reply_text("âŒ You cannot transfer balance to yourself! Type /cancel to abort.")
+            await update.message.reply_text("❌ You cannot transfer balance to yourself! Type /cancel to abort.")
             return
             
         context.user_data["awaiting_transfer_userid"] = False
@@ -1108,7 +1107,7 @@ async def handle_user_message(update: Update, context: ContextTypes.DEFAULT_TYPE
         
         username = f"@{target_user[1]}" if target_user[1] else target_id
         
-        default_amount_prompt = "<tg-emoji emoji-id=\"6267291337171670780\">âœ…</tg-emoji> User found: {username}\n\n<tg-emoji emoji-id=\"5262559368351602280\">ðŸ’¸</tg-emoji> <b>Enter Amount to Transfer:</b>\n(Min â‚¹1)\nType /cancel to abort."
+        default_amount_prompt = "<tg-emoji emoji-id=\"6267291337171670780\">✅</tg-emoji> User found: {username}\n\n<tg-emoji emoji-id=\"5262559368351602280\">💸</tg-emoji> <b>Enter Amount to Transfer:</b>\n(Min ₹1)\nType /cancel to abort."
         prompt_template = get_text_safe("transfer_amount_caption", default_amount_prompt)
         text_to_send = prompt_template.replace("{username}", username)
         
@@ -1121,11 +1120,11 @@ async def handle_user_message(update: Update, context: ContextTypes.DEFAULT_TYPE
             if amt < 1:
                 raise ValueError()
         except:
-            await update.message.reply_text("âŒ Invalid amount. Must be a number >= 1. Type /cancel to abort.")
+            await update.message.reply_text("❌ Invalid amount. Must be a number >= 1. Type /cancel to abort.")
             return
         sender_balance = db.get_balance(user_id)
         if sender_balance < amt:
-            await update.message.reply_text(f"âŒ Insufficient balance! You have â‚¹{sender_balance:.2f}. Type /cancel to abort.")
+            await update.message.reply_text(f"❌ Insufficient balance! You have ₹{sender_balance:.2f}. Type /cancel to abort.")
             return
         target_id = context.user_data["transfer_target_id"]
         db.update_balance(user_id, -amt)
@@ -1134,13 +1133,13 @@ async def handle_user_message(update: Update, context: ContextTypes.DEFAULT_TYPE
         context.user_data["transfer_target_id"] = None
         sender_new = db.get_balance(user_id)
         
-        default_success_msg = "<tg-emoji emoji-id=\"6267291337171670780\">âœ…</tg-emoji> <b>Transfer Successful!</b>\n\nSent â‚¹{amt} to <code>{target_id}</code>\nYour new balance: â‚¹{sender_new}"
+        default_success_msg = "<tg-emoji emoji-id=\"6267291337171670780\">✅</tg-emoji> <b>Transfer Successful!</b>\n\nSent ₹{amt} to <code>{target_id}</code>\nYour new balance: ₹{sender_new}"
         success_template = get_text_safe("transfer_success_msg", default_success_msg)
         success_text = success_template.replace("{amt}", f"{amt:.2f}").replace("{target_id}", target_id).replace("{sender_new}", f"{sender_new:.2f}")
         
         await update.message.reply_text(success_text, parse_mode="HTML")
         try:
-            default_received_msg = "ðŸ’° <b>You received â‚¹{amt}!</b>\nFrom User ID: <code>{user_id}</code>"
+            default_received_msg = "💰 <b>You received ₹{amt}!</b>\nFrom User ID: <code>{user_id}</code>"
             received_template = get_text_safe("transfer_received_msg", default_received_msg)
             received_text = received_template.replace("{amt}", f"{amt:.2f}").replace("{user_id}", user_id)
             await context.bot.send_message(chat_id=int(target_id), text=received_text, parse_mode="HTML")
@@ -1158,11 +1157,11 @@ async def process_purchase_with_android_id(update: Update, context: ContextTypes
     price = product_data['price']
     
     # UI update first
-    processing_msg = await update.message.reply_text('<tg-emoji emoji-id="6070873970100409600">â³</tg-emoji> <b>Processing your order with your Android ID...</b>', parse_mode="HTML")
+    processing_msg = await update.message.reply_text('<tg-emoji emoji-id="6070873970100409600">⏳</tg-emoji> <b>Processing your order with your Android ID...</b>', parse_mode="HTML")
     
     # Deduct balance atomically
     if not db.deduct_balance(user_id, price):
-        await processing_msg.edit_text("âŒ Insufficient balance!")
+        await processing_msg.edit_text("❌ Insufficient balance!")
         return
     
     # Fetch license key with user's Android ID
@@ -1170,7 +1169,7 @@ async def process_purchase_with_android_id(update: Update, context: ContextTypes
         license_key = db.get_manual_key(product_id, plan_name)
         if not license_key:
             db.update_balance(user_id, price)
-            await update.message.reply_text("âŒ Out of stock! No keys available. Balance refunded.")
+            await update.message.reply_text("❌ Out of stock! No keys available. Balance refunded.")
             return
     else:
         license_key = await asyncio.to_thread(fetch_license_key, product_id, plan_name, android_id)
@@ -1182,7 +1181,7 @@ async def process_purchase_with_android_id(update: Update, context: ContextTypes
         admin_username = f"@{admin_user['username']}" if admin_user and admin_user.get("username") else "the Owner"
         
         await update.message.reply_text(
-            f"âŒ <b>Purchase Failed!</b>\n\nServer problem, contact owner {admin_username}\n\nðŸ’° Your balance has been refunded.",
+            f"❌ <b>Purchase Failed!</b>\n\nServer problem, contact owner {admin_username}\n\n💰 Your balance has been refunded.",
             parse_mode="HTML"
         )
         return
@@ -1194,12 +1193,12 @@ async def process_purchase_with_android_id(update: Update, context: ContextTypes
         import requests
         from datetime import datetime
         admin_msg = (
-            f"ðŸ› <b>NEW KEY PURCHASED!</b>\n\n"
-            f"ðŸ‘¤ <b>User:</b> @{update.message.from_user.username or 'N/A'} (<code>{user_id}</code>)\n"
-            f"ðŸ›ï¸ <b>Product:</b> {product_name} - {plan_name}\n"
-            f"ðŸ’µ <b>Paid:</b> â‚¹{price}\n"
-            f"ðŸ”‘ <b>Key:</b> <code>{license_key}</code>\n"
-            f"ðŸ•’ <b>Time:</b> {datetime.now().strftime('%d-%m-%Y %I:%M %p')}"
+            f"🛍 <b>NEW KEY PURCHASED!</b>\n\n"
+            f"👤 <b>User:</b> @{update.message.from_user.username or 'N/A'} (<code>{user_id}</code>)\n"
+            f"🛍️ <b>Product:</b> {product_name} - {plan_name}\n"
+            f"💵 <b>Paid:</b> ₹{price}\n"
+            f"🔑 <b>Key:</b> <code>{license_key}</code>\n"
+            f"🕒 <b>Time:</b> {datetime.now().strftime('%d-%m-%Y %I:%M %p')}"
         )
         requests.post(
             f"https://api.telegram.org/bot{TOKEN}/sendMessage",
@@ -1211,17 +1210,17 @@ async def process_purchase_with_android_id(update: Update, context: ContextTypes
     
     # Success message
     text = f"""
-ðŸŽ‰ <b>PURCHASE SUCCESSFUL!</b> âœ¨
+🎉 <b>PURCHASE SUCCESSFUL!</b> ✨
 
-ðŸ›ï¸ <b>Product:</b> {product_name}
-â³ <b>Validity:</b> {plan_name}
-ðŸ’Ž <b>Price:</b> â‚¹{price}
-ðŸ“± <b>Android ID:</b> <code>{android_id}</code>
+🛍️ <b>Product:</b> {product_name}
+⏳ <b>Validity:</b> {plan_name}
+💎 <b>Price:</b> ₹{price}
+📱 <b>Android ID:</b> <code>{android_id}</code>
 
-ðŸ‘‘ <b>YOUR LICENSE KEY:</b>
+👑 <b>YOUR LICENSE KEY:</b>
 <code>{license_key}</code>
 
-âœ… <b>Key saved to your history!</b>
+✅ <b>Key saved to your history!</b>
 """
     
     keyboard = [[CB("Main Menu", style="primary", icon=get_button_emoji("shop"), callback_data="back_to_menu")]]
@@ -1242,23 +1241,23 @@ async def process_purchase_with_android_id(update: Update, context: ContextTypes
             try: await context.bot.send_voice(chat_id=update.effective_chat.id, voice=voice_id)
             except Exception as e: logger.error(f"Error sending voice: {e}")
         if link:
-            try: await context.bot.send_message(chat_id=update.effective_chat.id, text=f"ðŸ”— <b>Product Link:</b>\n{link}", parse_mode="HTML")
+            try: await context.bot.send_message(chat_id=update.effective_chat.id, text=f"🔗 <b>Product Link:</b>\n{link}", parse_mode="HTML")
             except Exception as e: logger.error(f"Error sending product link: {e}")
 
 # ============================================
-# ðŸ“¢ BROADCAST
+# 📢 BROADCAST
 # ============================================
 
 async def broadcast_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = str(update.effective_user.id)
     if user_id != str(ADMIN_ID):
-        await update.message.reply_text("âŒ You are not authorized!")
+        await update.message.reply_text("❌ You are not authorized!")
         return
 
     context.user_data["awaiting_broadcast"] = True
     await update.message.reply_text(
-        "ðŸ“¢ <b>Broadcast Mode ON</b>\n\n"
-        "Ab jo bhi message bhejoge (text, photo, video, voice, audio, document, sticker â€” kuch bhi) "
+        "📢 <b>Broadcast Mode ON</b>\n\n"
+        "Ab jo bhi message bhejoge (text, photo, video, voice, audio, document, sticker — kuch bhi) "
         "wo sabhi users ko bhej diya jaayega.\n\n"
         "Cancel karne ke liye /cancel bhejo.",
         parse_mode="HTML"
@@ -1277,7 +1276,7 @@ async def broadcast_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for f in flags:
         context.user_data[f] = False
     if was_active:
-        await update.message.reply_text("âŒ Cancelled.")
+        await update.message.reply_text("❌ Cancelled.")
 
 async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = str(update.effective_user.id)
@@ -1288,12 +1287,12 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
     if addkeys_id:
         if (update.message.text or "").strip() == "/cancel":
             context.user_data.pop("awaiting_manual_addkeys", None)
-            await update.message.reply_text("âŒ Cancelled.")
+            await update.message.reply_text("❌ Cancelled.")
             return
             
         keys = [line.strip() for line in update.message.text.split("\n") if line.strip()]
         if not keys:
-            await update.message.reply_text("âŒ Ek bhi key nahi mili! Dobara bhejye har line me ek key:")
+            await update.message.reply_text("❌ Ek bhi key nahi mili! Dobara bhejye har line me ek key:")
             return
             
         plan_info = db.get_plan_by_id(addkeys_id)
@@ -1306,12 +1305,12 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
                 [CB("Back to Dashboard", style="danger", icon=get_button_emoji("back"), callback_data=encode_cb("admin_manual_dash", addkeys_id))]
             ]
             await update.message.reply_text(
-                f"âœ… <b>SUCCESS!</b>\n\nAdded {added} keys to {plan_info['name']} - {plan_info['plan']}.", 
+                f"✅ <b>SUCCESS!</b>\n\nAdded {added} keys to {plan_info['name']} - {plan_info['plan']}.", 
                 parse_mode="HTML", 
                 reply_markup=InlineKeyboardMarkup(keyboard)
             )
         else:
-            await update.message.reply_text("âŒ Error: Product not found.")
+            await update.message.reply_text("❌ Error: Product not found.")
         return
 
     step = context.user_data.get("awaiting_manual_step")
@@ -1319,7 +1318,7 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
         if (update.message.text or "").strip() == "/cancel":
             context.user_data.pop("awaiting_manual_step", None)
             context.user_data.pop("manual_prod_data", None)
-            await update.message.reply_text("âŒ Cancelled.")
+            await update.message.reply_text("❌ Cancelled.")
             return
 
         data = context.user_data.get("manual_prod_data", {})
@@ -1328,31 +1327,31 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
         if step == 1:
             data["category"] = text
             context.user_data["awaiting_manual_step"] = 2
-            await update.message.reply_text(f"âœ… Category set to: {text}\n\nSTEP 2/5: Ab Product ka naam bataiye? (Jaise 'BALA MOD PRO')")
+            await update.message.reply_text(f"✅ Category set to: {text}\n\nSTEP 2/5: Ab Product ka naam bataiye? (Jaise 'BALA MOD PRO')")
             return
         elif step == 2:
             data["name"] = text
             context.user_data["awaiting_manual_step"] = 3
-            await update.message.reply_text(f"âœ… Name set to: {text}\n\nSTEP 3/5: Plan/Days kitne hain? (Jaise '1 Day' ya '1 Month')")
+            await update.message.reply_text(f"✅ Name set to: {text}\n\nSTEP 3/5: Plan/Days kitne hain? (Jaise '1 Day' ya '1 Month')")
             return
         elif step == 3:
             data["plan"] = text
             context.user_data["awaiting_manual_step"] = 4
-            await update.message.reply_text(f"âœ… Plan set to: {text}\n\nSTEP 4/5: Price kya rakhna hai? (Sirf number, jaise '150')")
+            await update.message.reply_text(f"✅ Plan set to: {text}\n\nSTEP 4/5: Price kya rakhna hai? (Sirf number, jaise '150')")
             return
         elif step == 4:
             try:
                 data["price"] = int(text)
             except:
-                await update.message.reply_text("âŒ Price sirf number hona chahiye! Dobara bhejiye:")
+                await update.message.reply_text("❌ Price sirf number hona chahiye! Dobara bhejiye:")
                 return
             context.user_data["awaiting_manual_step"] = 5
-            await update.message.reply_text(f"âœ… Price set to: â‚¹{data['price']}\n\nSTEP 5/5: Great! Ab is product ki saari Keys ek sath message me bhej dijiye (Har line me ek key).\n\n(Total keys count baad me bata dega)")
+            await update.message.reply_text(f"✅ Price set to: ₹{data['price']}\n\nSTEP 5/5: Great! Ab is product ki saari Keys ek sath message me bhej dijiye (Har line me ek key).\n\n(Total keys count baad me bata dega)")
             return
         elif step == 5:
             keys = [line.strip() for line in update.message.text.split("\n") if line.strip()]
             if not keys:
-                await update.message.reply_text("âŒ Ek bhi key nahi mili! Dobara bhejye har line me ek key:")
+                await update.message.reply_text("❌ Ek bhi key nahi mili! Dobara bhejye har line me ek key:")
                 return
             
             # Save product
@@ -1382,7 +1381,7 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
             
             context.user_data.pop("manual_prod_data", None)
             
-            await update.message.reply_text(f"âœ… <b>SUCCESS!</b>\n\nProduct `{data['name']}` successfully add ho gaya!\nTotal {added} offline keys stock me daal di gayi hain.", reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
+            await update.message.reply_text(f"✅ <b>SUCCESS!</b>\n\nProduct `{data['name']}` successfully add ho gaya!\nTotal {added} offline keys stock me daal di gayi hain.", reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
             return
 
     trial_step = context.user_data.get("awaiting_trial_step")
@@ -1390,35 +1389,35 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
         text = update.message.text
         if text and text.strip() == "/cancel":
             context.user_data.pop("awaiting_trial_step", None)
-            await update.message.reply_text("âŒ Cancelled.")
+            await update.message.reply_text("❌ Cancelled.")
             return
             
         if trial_step == "apk":
             db.set_setting("trial_apk", text.strip())
-            await update.message.reply_text("âœ… Trial APK Link set successfully!")
+            await update.message.reply_text("✅ Trial APK Link set successfully!")
         elif trial_step == "setup":
             db.set_setting("trial_setup", text.strip())
-            await update.message.reply_text("âœ… Trial Setup Guide set successfully!")
+            await update.message.reply_text("✅ Trial Setup Guide set successfully!")
         elif trial_step == "msg":
             db.set_setting("trial_msg_chat_id", str(update.message.chat_id))
             db.set_setting("trial_msg_id", str(update.message.message_id))
-            await update.message.reply_text("âœ… Trial Message (Forward/File) set successfully!")
+            await update.message.reply_text("✅ Trial Message (Forward/File) set successfully!")
         elif trial_step == "voice":
             if update.message.voice:
                 db.set_setting("trial_voice_id", update.message.voice.file_id)
-                await update.message.reply_text("âœ… Trial Voice Note set successfully!")
+                await update.message.reply_text("✅ Trial Voice Note set successfully!")
             else:
-                await update.message.reply_text("âŒ This is not a Voice note. Try again.")
+                await update.message.reply_text("❌ This is not a Voice note. Try again.")
                 return
         elif trial_step == "key":
             # Save for copy_message to preserve Premium Emojis perfectly!
             db.set_setting("trial_key", update.message.text_html or text.strip()) # Fallback text
             db.set_setting("trial_key_msg_chat_id", str(update.message.chat_id))
             db.set_setting("trial_key_msg_id", str(update.message.message_id))
-            await update.message.reply_text("âœ… Trial Key set successfully! (Premium Emojis & Formatting Preserved)")
+            await update.message.reply_text("✅ Trial Key set successfully! (Premium Emojis & Formatting Preserved)")
         elif trial_step == "btnname":
             db.set_setting("trial_btnname", text.strip())
-            await update.message.reply_text("âœ… Trial Button Caption set successfully!")
+            await update.message.reply_text("✅ Trial Button Caption set successfully!")
         elif trial_step == "btnemoji":
             import re
             match = re.search(r'custom_emoji_id="(\d+)"', update.message.text_html or "")
@@ -1429,22 +1428,22 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
                         break
             if match:
                 db.set_setting("trial_btnemoji", match.group(1) if hasattr(match, 'group') else match)
-                await update.message.reply_text("âœ… Trial Button Emoji set successfully!")
+                await update.message.reply_text("✅ Trial Button Emoji set successfully!")
             else:
                 db.set_setting("trial_btnemoji", text.strip())
-                await update.message.reply_text("âœ… Trial Button Emoji set successfully (Standard Emoji)!")
+                await update.message.reply_text("✅ Trial Button Emoji set successfully (Standard Emoji)!")
                 
         elif trial_step == "menu_caption":
             db.set_setting("trial_menu_caption", update.message.text_html or text.strip())
             db.set_setting("trial_menu_msg_chat_id", str(update.message.chat_id))
             db.set_setting("trial_menu_msg_id", str(update.message.message_id))
-            await update.message.reply_text("âœ… Trial Menu Caption set successfully! (Premium Emojis Preserved)")
+            await update.message.reply_text("✅ Trial Menu Caption set successfully! (Premium Emojis Preserved)")
         elif trial_step == "setuplink":
             db.set_setting("trial_setuplink", text.strip())
-            await update.message.reply_text("âœ… Setup Link set successfully!")
+            await update.message.reply_text("✅ Setup Link set successfully!")
         elif trial_step == "feedbacklink":
             db.set_setting("trial_feedbacklink", text.strip())
-            await update.message.reply_text("âœ… Feedback Link set successfully!")
+            await update.message.reply_text("✅ Feedback Link set successfully!")
         elif trial_step in ["key_name", "key_emoji", "apk_name", "apk_emoji", "setup_name", "setup_emoji", "feedback_name", "feedback_emoji"]:
             # If it's an emoji setting, extract premium ID if present
             if "emoji" in trial_step:
@@ -1457,13 +1456,13 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
                             break
                 if match:
                     db.set_setting(f"trial_btn_{trial_step}", match.group(1) if hasattr(match, 'group') else match)
-                    await update.message.reply_text(f"âœ… {trial_step} set successfully (Premium Emoji)!")
+                    await update.message.reply_text(f"✅ {trial_step} set successfully (Premium Emoji)!")
                 else:
                     db.set_setting(f"trial_btn_{trial_step}", text.strip())
-                    await update.message.reply_text(f"âœ… {trial_step} set successfully (Standard Emoji)!")
+                    await update.message.reply_text(f"✅ {trial_step} set successfully (Standard Emoji)!")
             else:
                 db.set_setting(f"trial_btn_{trial_step}", text.strip())
-                await update.message.reply_text(f"âœ… {trial_step} set successfully!")
+                await update.message.reply_text(f"✅ {trial_step} set successfully!")
             
         context.user_data.pop("awaiting_trial_step", None)
         return
@@ -1471,7 +1470,7 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
     if context.user_data.get("awaiting_welcome_reaction"):
         context.user_data["awaiting_welcome_reaction"] = False
         if (update.message.text or "").strip() == "/cancel":
-            await update.message.reply_text("âŒ Cancelled.")
+            await update.message.reply_text("❌ Cancelled.")
             return
             
         emoji_id = ""
@@ -1484,13 +1483,13 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
                     
         if emoji_id:
             db.set_setting("welcome_reaction", emoji_id)
-            await update.message.reply_text(f"âœ… Welcome reaction updated to premium custom emoji: {emoji_id}\n\nâš ï¸ <b>NOTE:</b> Telegram bots CANNOT use premium custom emojis as reactions in private chats! Only standard emojis (ðŸ‘, â¤ï¸, ðŸ”¥, ðŸŽ‰) work. If the reaction doesn't appear on /start, please change it to a standard emoji.", parse_mode="HTML")
+            await update.message.reply_text(f"✅ Welcome reaction updated to premium custom emoji: {emoji_id}\n\n⚠️ <b>NOTE:</b> Telegram bots CANNOT use premium custom emojis as reactions in private chats! Only standard emojis (👍, ❤️, 🔥, 🎉) work. If the reaction doesn't appear on /start, please change it to a standard emoji.", parse_mode="HTML")
         else:
             # Assume it's a standard emoji
             emoji_str = (update.message.text or "").strip()
             if len(emoji_str) > 0:
                 db.set_setting("welcome_reaction", emoji_str)
-                await update.message.reply_text(f"âœ… Welcome reaction updated to standard emoji: {emoji_str}\n\nâš ï¸ <b>NOTE:</b> Telegram only allows a specific list of standard emojis for reactions (ðŸ‘, â¤ï¸, ðŸ”¥, ðŸŽ‰, ðŸ¤©). If it doesn't appear on /start, it means Telegram blocked that specific emoji for bots.", parse_mode="HTML")
+                await update.message.reply_text(f"✅ Welcome reaction updated to standard emoji: {emoji_str}\n\n⚠️ <b>NOTE:</b> Telegram only allows a specific list of standard emojis for reactions (👍, ❤️, 🔥, 🎉, 🤩). If it doesn't appear on /start, it means Telegram blocked that specific emoji for bots.", parse_mode="HTML")
         return
 
     if context.user_data.get("awaiting_product_voice"):
@@ -1498,12 +1497,12 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
         text = (update.message.text or "").strip()
         if text == "/cancel":
             context.user_data["awaiting_product_voice"] = None
-            await update.message.reply_text("âŒ Cancelled.")
+            await update.message.reply_text("❌ Cancelled.")
             return
         
         db.set_product_voice(product_id, update.effective_chat.id, update.message.message_id)
         context.user_data["awaiting_product_voice"] = None
-        await update.message.reply_text("âœ… Product Delivery Message set! Ab ye user ko purchase ke baad as-it-is copy hokar milega.\nâš ï¸ Is message ko yahan se delete mat karna.")
+        await update.message.reply_text("✅ Product Delivery Message set! Ab ye user ko purchase ke baad as-it-is copy hokar milega.\n⚠️ Is message ko yahan se delete mat karna.")
         return
 
     if context.user_data.get("awaiting_product_link"):
@@ -1511,7 +1510,7 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
         text = (update.message.text or "").strip()
         if text == "/cancel":
             context.user_data["awaiting_product_link"] = None
-            await update.message.reply_text("âŒ Cancelled.")
+            await update.message.reply_text("❌ Cancelled.")
             return
             
         if not text.startswith("http"):
@@ -1519,7 +1518,7 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
             
         db.set_product_link(product_id, text)
         context.user_data["awaiting_product_link"] = None
-        await update.message.reply_text(f"âœ… Link set for product!")
+        await update.message.reply_text(f"✅ Link set for product!")
         return
 
     if context.user_data.get("awaiting_text_key"):
@@ -1527,7 +1526,7 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
         text = (update.message.text or update.message.caption or "").strip()
         context.user_data["awaiting_text_key"] = None
         if text == "/cancel":
-            await update.message.reply_text("âŒ Cancelled.")
+            await update.message.reply_text("❌ Cancelled.")
             return
         
         # Sanitize text to prevent HTML parsing errors
@@ -1540,7 +1539,7 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
         text = text.replace('\\"', '"').replace("\\'", "'").replace('\\n', '\n')
         
         db.set_text(key, text)
-        await update.message.reply_text(f"âœ… Text for {EDITABLE_TEXTS.get(key, key)} successfully updated!")
+        await update.message.reply_text(f"✅ Text for {EDITABLE_TEXTS.get(key, key)} successfully updated!")
         return
 
     if context.user_data.get("awaiting_emoji_key"):
@@ -1548,7 +1547,7 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
         context.user_data["awaiting_emoji_key"] = None
         text = (update.message.text or "").strip()
         if text == "/cancel":
-            await update.message.reply_text("âŒ Cancelled.")
+            await update.message.reply_text("❌ Cancelled.")
             return
             
         emoji_id = text
@@ -1560,11 +1559,11 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
                     break
                     
         if not emoji_id.isdigit():
-            await update.message.reply_text("âŒ Invalid Emoji. Please send a valid Premium Custom Emoji or an Emoji ID number.")
+            await update.message.reply_text("❌ Invalid Emoji. Please send a valid Premium Custom Emoji or an Emoji ID number.")
             return
             
         db.set_emoji(key, emoji_id)
-        await update.message.reply_text(f"âœ… Emoji for '{key}' successfully updated to: {emoji_id}")
+        await update.message.reply_text(f"✅ Emoji for '{key}' successfully updated to: {emoji_id}")
         return
 
     if context.user_data.get("awaiting_newprice_id"):
@@ -1572,168 +1571,168 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
         context.user_data["awaiting_newprice_id"] = None
         text = (update.message.text or "").strip()
         if text == "/cancel":
-            await update.message.reply_text("âŒ Cancelled.")
+            await update.message.reply_text("❌ Cancelled.")
             return
         import re
         price_clean = re.sub(r'[^\d.]', '', text)
         if not price_clean:
-            await update.message.reply_text("âŒ Sirf number bhejo, jaise 150")
+            await update.message.reply_text("❌ Sirf number bhejo, jaise 150")
             return
         try:
             new_price = float(price_clean)
         except ValueError:
-            await update.message.reply_text("âŒ Sirf number bhejo, jaise 150")
+            await update.message.reply_text("❌ Sirf number bhejo, jaise 150")
             return
         if new_price <= 0:
-            await update.message.reply_text("âŒ Price 0 se zyada honi chahiye.")
+            await update.message.reply_text("❌ Price 0 se zyada honi chahiye.")
             return
         updated = db.update_product_price(plan_row_id, new_price)
         if updated:
-            await update.message.reply_text(f"âœ… Price update ho gayi! Naya price: â‚¹{new_price:.2f}")
+            await update.message.reply_text(f"✅ Price update ho gayi! Naya price: ₹{new_price:.2f}")
         else:
-            await update.message.reply_text("âŒ Plan nahi mila, update fail ho gaya.")
+            await update.message.reply_text("❌ Plan nahi mila, update fail ho gaya.")
         return
 
     if context.user_data.get("awaiting_trending_voice"):
         context.user_data["awaiting_trending_voice"] = False
         if (update.message.text or "").strip() == "/cancel":
-            await update.message.reply_text("âŒ Cancelled.")
+            await update.message.reply_text("❌ Cancelled.")
             return
             
         db.set_setting("trending_voice_chat_id", str(update.effective_chat.id))
         db.set_setting("trending_voice_msg_id", str(update.message.message_id))
         db.set_setting("trending_enabled", "1")
-        await update.message.reply_text("âœ… Trending Extra Media / Voice set ho gaya! Ab ye /start par dusre number par aayega.\nâš ï¸ Note: Is message ko yahan se delete mat karna, warna users ko nahi dikhega.")
+        await update.message.reply_text("✅ Trending Extra Media / Voice set ho gaya! Ab ye /start par dusre number par aayega.\n⚠️ Note: Is message ko yahan se delete mat karna, warna users ko nahi dikhega.")
         return
 
     if context.user_data.get("awaiting_trending_product"):
         context.user_data["awaiting_trending_product"] = False
         if (update.message.text or "").strip() == "/cancel":
-            await update.message.reply_text("âŒ Cancelled.")
+            await update.message.reply_text("❌ Cancelled.")
             return
             
         db.set_setting("trending_chat_id", str(update.effective_chat.id))
         db.set_setting("trending_msg_id", str(update.message.message_id))
         db.set_setting("trending_enabled", "1")
             
-        await update.message.reply_text("âœ… Trending Product set ho gaya! Ab ye sabse pehle /start par dikhega.\nâš ï¸ Note: Is message ko yahan se delete mat karna, warna users ko nahi dikhega.")
+        await update.message.reply_text("✅ Trending Product set ho gaya! Ab ye sabse pehle /start par dikhega.\n⚠️ Note: Is message ko yahan se delete mat karna, warna users ko nahi dikhega.")
         return
 
     if context.user_data.get("awaiting_welcome_photo"):
         context.user_data["awaiting_welcome_photo"] = False
         if (update.message.text or "").strip() == "/cancel":
-            await update.message.reply_text("âŒ Cancelled.")
+            await update.message.reply_text("❌ Cancelled.")
             return
         if not update.message.photo:
-            await update.message.reply_text("âŒ Ye photo nahi hai. Ek photo bhejo, ya /cancel karo.")
+            await update.message.reply_text("❌ Ye photo nahi hai. Ek photo bhejo, ya /cancel karo.")
             return
         file_id = update.message.photo[-1].file_id
         db.set_welcome_media("photo", file_id)
-        await update.message.reply_text("âœ… Welcome photo set ho gayi! Ab /start karke check kar lo.")
+        await update.message.reply_text("✅ Welcome photo set ho gayi! Ab /start karke check kar lo.")
         return
 
     if context.user_data.get("awaiting_welcome_video"):
         context.user_data["awaiting_welcome_video"] = False
         if (update.message.text or "").strip() == "/cancel":
-            await update.message.reply_text("âŒ Cancelled.")
+            await update.message.reply_text("❌ Cancelled.")
             return
         if not update.message.video:
-            await update.message.reply_text("âŒ Ye video nahi hai. Ek video bhejo, ya /cancel karo.")
+            await update.message.reply_text("❌ Ye video nahi hai. Ek video bhejo, ya /cancel karo.")
             return
         file_id = update.message.video.file_id
         db.set_welcome_media("video", file_id)
-        await update.message.reply_text("âœ… Welcome video set ho gayi! Ab /start karke check kar lo.")
+        await update.message.reply_text("✅ Welcome video set ho gayi! Ab /start karke check kar lo.")
         return
 
     if context.user_data.get("awaiting_screen_photo"):
         screen_key = context.user_data["awaiting_screen_photo"]
         context.user_data["awaiting_screen_photo"] = None
         if (update.message.text or "").strip() == "/cancel":
-            await update.message.reply_text("âŒ Cancelled.")
+            await update.message.reply_text("❌ Cancelled.")
             return
         if not update.message.photo:
-            await update.message.reply_text("âŒ Ye photo nahi hai. Ek photo bhejo, ya /cancel karo.")
+            await update.message.reply_text("❌ Ye photo nahi hai. Ek photo bhejo, ya /cancel karo.")
             return
         file_id = update.message.photo[-1].file_id
         db.set_screen_media(screen_key, "photo", file_id)
         label = SCREEN_LABELS.get(screen_key, screen_key)
-        await update.message.reply_text(f"âœ… {label} ki photo set ho gayi!")
+        await update.message.reply_text(f"✅ {label} ki photo set ho gayi!")
         return
 
     if context.user_data.get("awaiting_screen_video"):
         screen_key = context.user_data["awaiting_screen_video"]
         context.user_data["awaiting_screen_video"] = None
         if (update.message.text or "").strip() == "/cancel":
-            await update.message.reply_text("âŒ Cancelled.")
+            await update.message.reply_text("❌ Cancelled.")
             return
         if not update.message.video:
-            await update.message.reply_text("âŒ Ye video nahi hai. Ek video bhejo, ya /cancel karo.")
+            await update.message.reply_text("❌ Ye video nahi hai. Ek video bhejo, ya /cancel karo.")
             return
         file_id = update.message.video.file_id
         db.set_screen_media(screen_key, "video", file_id)
         label = SCREEN_LABELS.get(screen_key, screen_key)
-        await update.message.reply_text(f"âœ… {label} ki video set ho gayi!")
+        await update.message.reply_text(f"✅ {label} ki video set ho gayi!")
         return
 
     if context.user_data.get("awaiting_addreseller"):
         context.user_data["awaiting_addreseller"] = False
         target_id = (update.message.text or "").strip()
         if not target_id.isdigit():
-            await update.message.reply_text("âŒ Invalid USER_ID.")
+            await update.message.reply_text("❌ Invalid USER_ID.")
             return
         changed = db.set_reseller(target_id, True)
         if changed:
-            await update.message.reply_text(f"âœ… User <code>{target_id}</code> ab reseller hai ({RESELLER_DISCOUNT_PERCENT}% discount).", parse_mode="HTML")
+            await update.message.reply_text(f"✅ User <code>{target_id}</code> ab reseller hai ({RESELLER_DISCOUNT_PERCENT}% discount).", parse_mode="HTML")
             try:
                 await context.bot.send_message(
                     chat_id=int(target_id),
-                    text=f"ðŸ‘‘ <b>Congratulations!</b> Aap ab Reseller ban gaye ho â€” sabhi products par {RESELLER_DISCOUNT_PERCENT}% discount milega!",
+                    text=f"👑 <b>Congratulations!</b> Aap ab Reseller ban gaye ho — sabhi products par {RESELLER_DISCOUNT_PERCENT}% discount milega!",
                     parse_mode="HTML"
                 )
             except Exception:
                 pass
         else:
-            await update.message.reply_text("âŒ User not found. Pehle usko /start karwao.")
+            await update.message.reply_text("❌ User not found. Pehle usko /start karwao.")
         return
 
     if context.user_data.get("awaiting_removereseller"):
         context.user_data["awaiting_removereseller"] = False
         target_id = (update.message.text or "").strip()
         if not target_id.isdigit():
-            await update.message.reply_text("âŒ Invalid USER_ID.")
+            await update.message.reply_text("❌ Invalid USER_ID.")
             return
         changed = db.set_reseller(target_id, False)
         if changed:
-            await update.message.reply_text(f"âœ… User <code>{target_id}</code> ka reseller status hata diya.", parse_mode="HTML")
+            await update.message.reply_text(f"✅ User <code>{target_id}</code> ka reseller status hata diya.", parse_mode="HTML")
         else:
-            await update.message.reply_text("âŒ User not found.")
+            await update.message.reply_text("❌ User not found.")
         return
 
     if context.user_data.get("awaiting_addproduct"):
         context.user_data["awaiting_addproduct"] = False
         text = (update.message.text or "").strip()
         if text == "/cancel":
-            await update.message.reply_text("âŒ Cancelled.")
+            await update.message.reply_text("❌ Cancelled.")
             return
         try:
             p = parse_product_line(text)
         except ValueError as e:
-            await update.message.reply_text(f"âŒ {e}")
+            await update.message.reply_text(f"❌ {e}")
             return
 
         try:
             db.add_product(p["category"], p["name"], p["product_id"], p["plan"], p["price"], p["android_id"])
             await update.message.reply_text(
-                f"âœ… Product Added!\n"
-                f"ðŸ“¦ {p['name']}\n"
-                f"â³ {p['plan']}\n"
-                f"ðŸ’° â‚¹{p['price']:.2f}\n"
-                f"ðŸ†” ID: {p['product_id']}\n"
-                f"ðŸ“‚ Category: {p['category']}"
+                f"✅ Product Added!\n"
+                f"📦 {p['name']}\n"
+                f"⏳ {p['plan']}\n"
+                f"💰 ₹{p['price']:.2f}\n"
+                f"🆔 ID: {p['product_id']}\n"
+                f"📂 Category: {p['category']}"
             )
         except Exception as e:
             logger.error(f"add_product DB error: {e}")
-            await update.message.reply_text(f"âŒ Product save nahi ho paya: {e}")
+            await update.message.reply_text(f"❌ Product save nahi ho paya: {e}")
         return
 
     if context.user_data.get("awaiting_addbalance"):
@@ -1745,20 +1744,20 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
             db.update_balance(target_id, amt)
             new_balance = db.get_balance(target_id)
             await update.message.reply_text(
-                f"âœ… â‚¹{amt:.2f} added to user <code>{target_id}</code>\n"
-                f"ðŸ’° New balance: â‚¹{new_balance:.2f}",
+                f"✅ ₹{amt:.2f} added to user <code>{target_id}</code>\n"
+                f"💰 New balance: ₹{new_balance:.2f}",
                 parse_mode="HTML"
             )
             try:
                 await context.bot.send_message(
                     chat_id=int(target_id),
-                    text=f"ðŸ’° <b>â‚¹{amt:.2f} added to your wallet by admin!</b>\nNew balance: â‚¹{new_balance:.2f}",
+                    text=f"💰 <b>₹{amt:.2f} added to your wallet by admin!</b>\nNew balance: ₹{new_balance:.2f}",
                     parse_mode="HTML"
                 )
             except Exception:
                 pass
         except Exception as e:
-            await update.message.reply_text(f"âŒ Error: {e}\n\nFormat: USER_ID AMOUNT")
+            await update.message.reply_text(f"❌ Error: {e}\n\nFormat: USER_ID AMOUNT")
         return
 
     if context.user_data.get("awaiting_removebalance"):
@@ -1770,12 +1769,12 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
             db.update_balance(target_id, -amt)
             new_balance = db.get_balance(target_id)
             await update.message.reply_text(
-                f"âœ… â‚¹{amt:.2f} removed from user <code>{target_id}</code>\n"
-                f"ðŸ’° New balance: â‚¹{new_balance:.2f}",
+                f"✅ ₹{amt:.2f} removed from user <code>{target_id}</code>\n"
+                f"💰 New balance: ₹{new_balance:.2f}",
                 parse_mode="HTML"
             )
         except Exception as e:
-            await update.message.reply_text(f"âŒ Error: {e}\n\nFormat: USER_ID AMOUNT")
+            await update.message.reply_text(f"❌ Error: {e}\n\nFormat: USER_ID AMOUNT")
         return
 
     if not context.user_data.get("awaiting_broadcast"):
@@ -1789,7 +1788,7 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
     sent = 0
     failed = 0
 
-    status_msg = await update.message.reply_text(f"â³ Broadcasting to {total} users...")
+    status_msg = await update.message.reply_text(f"⏳ Broadcasting to {total} users...")
 
     for uid in user_ids:
         try:
@@ -1805,10 +1804,10 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
         await asyncio.sleep(0.05)
 
     await status_msg.edit_text(
-        f"âœ… <b>Broadcast Complete!</b>\n\n"
-        f"ðŸ“¤ Sent: {sent}\n"
-        f"âŒ Failed: {failed}\n"
-        f"ðŸ‘¥ Total: {total}",
+        f"✅ <b>Broadcast Complete!</b>\n\n"
+        f"📤 Sent: {sent}\n"
+        f"❌ Failed: {failed}\n"
+        f"👥 Total: {total}",
         parse_mode="HTML"
     )
 
@@ -1817,15 +1816,15 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
 # ============================================
 
 SCREEN_LABELS = {
-    "shop": "ðŸ› Store",
-    "profile": "ðŸ‘¤ My Profile",
-    "history": "ðŸ“œ Order History",
-    "deposit_history": "ðŸ’³ Deposit History",
-    "referral": "â­ Referral",
-    "tutorial": "ðŸ“˜ Tutorial",
-    "support": "ðŸ†˜ Support",
-    "download": "â¬‡ï¸ Download Hack",
-    "payment": "ðŸ’³ Payment",
+    "shop": "🛍 Store",
+    "profile": "👤 My Profile",
+    "history": "📜 Order History",
+    "deposit_history": "💳 Deposit History",
+    "referral": "⭐ Referral",
+    "tutorial": "📘 Tutorial",
+    "support": "🆘 Support",
+    "download": "⬇️ Download Hack",
+    "payment": "💳 Payment",
 }
 
 async def _safe_edit_text(msg, text, reply_markup, parse_mode):
@@ -1854,7 +1853,7 @@ async def safe_answer(query, *args, **kwargs):
             logging.getLogger("KaranPayBot").warning(f"Failed to answer query: {e}")
 
 async def safe_edit(query, text, reply_markup=None, parse_mode="HTML"):
-    """Edit the callback's message text â€” but if the current message is media
+    """Edit the callback's message text — but if the current message is media
     (photo/video, e.g. a welcome/screen with custom media set), delete and
     resend as plain text, since Telegram can't text-edit a media message."""
     msg = query.message
@@ -1918,14 +1917,14 @@ async def send_screen(query, text, reply_markup, screen_key=None, parse_mode="HT
             pass
 
 WELCOME_TEXT = (
-    f'<tg-emoji emoji-id="6071312005224993914">ðŸ’Ž</tg-emoji> <b>Product Store : all key purchase &amp; instantly delivery</b>\n'
-    f'<tg-emoji emoji-id="6071074330324768982">ðŸ‘¤</tg-emoji> <b>My Profile : check your account information</b>\n'
-    f'<tg-emoji emoji-id="6071132024620455409">ðŸ’°</tg-emoji> <b>Add Balance : deposit balance &amp; secure service</b>\n'
-    f'<tg-emoji emoji-id="6070878939377571385">ðŸ“œ</tg-emoji> <b>Order History : check all key purchase history</b>\n'
-    f'<tg-emoji emoji-id="6071126054615913700">ðŸ’³</tg-emoji> <b>Deposit History : check all your deposits</b>\n'
-    f'<tg-emoji emoji-id="6073116574389113063">ðŸ“˜</tg-emoji> <b>Tutorial : view tutorial and work this bot</b>\n'
-    f'<tg-emoji emoji-id="6071312005224993914">ðŸ†˜</tg-emoji> <b>Support : bot problem fixed for support admin</b>\n'
-    f'<tg-emoji emoji-id="6071074330324768982">â¬‡ï¸</tg-emoji> <b>Download Hack : download latest apk for safety.</b>'
+    f'<tg-emoji emoji-id="6071312005224993914">💎</tg-emoji> <b>Product Store : all key purchase &amp; instantly delivery</b>\n'
+    f'<tg-emoji emoji-id="6071074330324768982">👤</tg-emoji> <b>My Profile : check your account information</b>\n'
+    f'<tg-emoji emoji-id="6071132024620455409">💰</tg-emoji> <b>Add Balance : deposit balance &amp; secure service</b>\n'
+    f'<tg-emoji emoji-id="6070878939377571385">📜</tg-emoji> <b>Order History : check all key purchase history</b>\n'
+    f'<tg-emoji emoji-id="6071126054615913700">💳</tg-emoji> <b>Deposit History : check all your deposits</b>\n'
+    f'<tg-emoji emoji-id="6073116574389113063">📘</tg-emoji> <b>Tutorial : view tutorial and work this bot</b>\n'
+    f'<tg-emoji emoji-id="6071312005224993914">🆘</tg-emoji> <b>Support : bot problem fixed for support admin</b>\n'
+    f'<tg-emoji emoji-id="6071074330324768982">⬇️</tg-emoji> <b>Download Hack : download latest apk for safety.</b>'
 )
 
 async def send_welcome(bot, chat_id, is_admin):
@@ -1948,7 +1947,7 @@ async def send_welcome(bot, chat_id, is_admin):
             # Fallback to the safe hardcoded text
             fallback_text = WELCOME_TEXT
             
-            error_notice = "âš ï¸ <b>Admin Notice:</b> Your custom welcome text was corrupted and caused an error! It has been automatically reset to default.\n\n"
+            error_notice = "⚠️ <b>Admin Notice:</b> Your custom welcome text was corrupted and caused an error! It has been automatically reset to default.\n\n"
             final_text = error_notice + fallback_text if is_admin else fallback_text
             
             if media_type == "video":
@@ -1981,7 +1980,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
     if db.get_setting("maintenance_mode") == "1" and user_id != str(ADMIN_ID):
-        msg = get_text_safe("maintenance_msg", "ðŸ›  <b>Bot is currently under maintenance. Please try again later.</b>")
+        msg = get_text_safe("maintenance_msg", "🛠 <b>Bot is currently under maintenance. Please try again later.</b>")
         await update.message.reply_text(msg, parse_mode="HTML")
         return
 
@@ -2003,7 +2002,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 logger.info(f"Referral linked: {user_id} -> referred by {referrer_id}")
                 try:
                     join_msg = (
-                        f"ðŸŽ‰ <b>Naya Referral!</b>\n\n"
+                        f"🎉 <b>Naya Referral!</b>\n\n"
                         f"Aapke link se ek naya user join hua hai. "
                         f"Jab wo deposit karega, aapko {REFERRAL_COMMISSION_PERCENT}% bonus milega!"
                     )
@@ -2052,19 +2051,19 @@ async def add_product(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = str(update.effective_user.id)
     
     if user_id != str(ADMIN_ID):
-        await update.message.reply_text("âŒ You are not authorized!")
+        await update.message.reply_text("❌ You are not authorized!")
         return
     
     text = update.message.text.replace("/addproduct", "", 1).strip()
     if not text:
         await update.message.reply_text(
-            "âŒ Usage:\n"
+            "❌ Usage:\n"
             "/addproduct CATEGORY | NAME | PRODUCT_ID | PLAN | PRICE | ANDROID_ID\n\n"
             "Categories:\n"
-            "ðŸ¤– ANDROID NON ROOT\n"
-            "ðŸ‘‘ ANDROID ROOT\n"
-            "ðŸ’» PC\n"
-            "ðŸŽ IOS\n\n"
+            "🤖 ANDROID NON ROOT\n"
+            "👑 ANDROID ROOT\n"
+            "💻 PC\n"
+            "🍎 IOS\n\n"
             "Example:\n"
             "/addproduct ANDROID NON ROOT | BALA MOD PRO | 133 | 1 Day | 150 | 0b9b969bc2e7997b"
         )
@@ -2073,22 +2072,22 @@ async def add_product(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         p = parse_product_line(text)
     except ValueError as e:
-        await update.message.reply_text(f"âŒ {e}")
+        await update.message.reply_text(f"❌ {e}")
         return
 
     try:
         db.add_product(p["category"], p["name"], p["product_id"], p["plan"], p["price"], p["android_id"])
         await update.message.reply_text(
-            f"âœ… Product Added!\n"
-            f"ðŸ“¦ {p['name']}\n"
-            f"â³ {p['plan']}\n"
-            f"ðŸ’° â‚¹{p['price']:.2f}\n"
-            f"ðŸ†” ID: {p['product_id']}\n"
-            f"ðŸ“‚ Category: {p['category']}"
+            f"✅ Product Added!\n"
+            f"📦 {p['name']}\n"
+            f"⏳ {p['plan']}\n"
+            f"💰 ₹{p['price']:.2f}\n"
+            f"🆔 ID: {p['product_id']}\n"
+            f"📂 Category: {p['category']}"
         )
     except Exception as e:
         logger.error(f"add_product DB error: {e}")
-        await update.message.reply_text(f"âŒ Product save nahi ho paya: {e}")
+        await update.message.reply_text(f"❌ Product save nahi ho paya: {e}")
 
 async def check_payment_later(context: ContextTypes.DEFAULT_TYPE, chat_id, message_id, order_id, delay=15):
     await asyncio.sleep(delay)
@@ -2099,11 +2098,11 @@ async def check_payment_later(context: ContextTypes.DEFAULT_TYPE, chat_id, messa
         return
 
     msg = f"""
-âŒ <b>PAYMENT NOT FOUND</b>
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
-ðŸ†” <b>Order:</b> <code>{order_id}</code>
-ðŸ’° <b>Amount:</b> â‚¹{order[2]:.2f}
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+❌ <b>PAYMENT NOT FOUND</b>
+━━━━━━━━━━━━━━━━━━
+🆔 <b>Order:</b> <code>{order_id}</code>
+💰 <b>Amount:</b> ₹{order[2]:.2f}
+━━━━━━━━━━━━━━━━━━
 Hume abhi tak aapka payment nahi mila.
 Agar aapne payment kar diya hai, thodi der baad "Check Again" try karein.
 Agar payment nahi kiya, to "Cancel" dabayein aur naya QR banayein.
@@ -2132,7 +2131,7 @@ async def handle_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             context.user_data[key] = False
 
     if db.get_setting("maintenance_mode") == "1" and str(update.effective_user.id) != str(ADMIN_ID) and not query.data.startswith("admin_"):
-        msg = get_text_safe("maintenance_msg", "ðŸ›  <b>Bot is currently under maintenance. Please try again later.</b>")
+        msg = get_text_safe("maintenance_msg", "🛠 <b>Bot is currently under maintenance. Please try again later.</b>")
         try:
             await safe_answer(query, "Bot is under maintenance!", show_alert=True)
             await safe_edit(query, text=msg, parse_mode="HTML")
@@ -2146,7 +2145,7 @@ async def handle_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.error(f"handle_callbacks error on data='{query.data}': {e}", exc_info=True)
         alert_shown = False
         try:
-            await safe_answer(query, f"âŒ Error: {str(e)[:180]}", show_alert=True)
+            await safe_answer(query, f"❌ Error: {str(e)[:180]}", show_alert=True)
             alert_shown = True
         except Exception:
             pass
@@ -2154,7 +2153,7 @@ async def handle_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             try:
                 await context.bot.send_message(
                     chat_id=query.message.chat_id,
-                    text=f"âŒ <b>Error:</b> <code>{str(e)[:300]}</code>",
+                    text=f"❌ <b>Error:</b> <code>{str(e)[:300]}</code>",
                     parse_mode="HTML"
                 )
             except Exception:
@@ -2163,7 +2162,7 @@ async def handle_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             try:
                 await context.bot.send_message(
                     chat_id=ADMIN_ID,
-                    text=f"âš ï¸ <b>Bot Error</b>\n\nðŸ”˜ Button: <code>{query.data}</code>\nâŒ Error: <code>{str(e)[:500]}</code>",
+                    text=f"⚠️ <b>Bot Error</b>\n\n🔘 Button: <code>{query.data}</code>\n❌ Error: <code>{str(e)[:500]}</code>",
                     parse_mode="HTML"
                 )
             except Exception:
@@ -2195,7 +2194,7 @@ async def _handle_callbacks_inner(update: Update, context: ContextTypes.DEFAULT_
 
     elif data == "menu_shop":
         products = db.get_products()
-        default_shop = f"<b>ðŸ“Š HACK STORE â€” SHOP ðŸ’­</b>\n\n<tg-emoji emoji-id=\"6070873970100409600\">â­</tg-emoji> <b>Choose your device category:</b>"
+        default_shop = f"<b>📊 HACK STORE — SHOP 💭</b>\n\n<tg-emoji emoji-id=\"6070873970100409600\">⭐</tg-emoji> <b>Choose your device category:</b>"
         text = get_text_safe("shop", default_shop)
         keyboard = []
         
@@ -2214,7 +2213,7 @@ async def _handle_callbacks_inner(update: Update, context: ContextTypes.DEFAULT_
         parts = decode_cb(data)
         category = parts[1]
         products = db.get_products()
-        default_text = f"<b>ðŸ“‚ Category: {category}</b>\n\nSelect a product to purchase:"
+        default_text = f"<b>📂 Category: {category}</b>\n\nSelect a product to purchase:"
         text = get_text_safe(f"cat_{category}", default_text)
         keyboard = []
         for prod_name in products.get(category, {}).keys():
@@ -2234,16 +2233,16 @@ async def _handle_callbacks_inner(update: Update, context: ContextTypes.DEFAULT_
         plan_ids = products[category][prod_name]["plan_ids"]
         is_reseller = db.is_reseller(user_id)
 
-        text = f"<b>ðŸ’Ž Product: {prod_name}</b>\n\nChoose expiration pack period below:"
+        text = f"<b>💎 Product: {prod_name}</b>\n\nChoose expiration pack period below:"
         if is_reseller:
-            text += f"\nðŸ‘‘ <b>Reseller Price ({RESELLER_DISCOUNT_PERCENT}% OFF)</b>"
+            text += f"\n👑 <b>Reseller Price ({RESELLER_DISCOUNT_PERCENT}% OFF)</b>"
         keyboard = []
         for plan_name, price in plans.items():
             final_price = get_price_for_user(price, user_id)
             if is_reseller:
-                label = f"{plan_name} - â‚¹{final_price:.0f} (was â‚¹{price:.0f})"
+                label = f"{plan_name} - ₹{final_price:.0f} (was ₹{price:.0f})"
             else:
-                label = f"{plan_name} - â‚¹{price:.0f}"
+                label = f"{plan_name} - ₹{price:.0f}"
             cb = encode_cb("buy", plan_ids[plan_name])
             keyboard.append([CB(label, style="primary", icon=get_button_emoji("plan"), callback_data=cb)])
         keyboard.append([CB("Back", style="danger", icon=get_button_emoji("back"), callback_data=encode_cb("cat", category))])
@@ -2255,7 +2254,7 @@ async def _handle_callbacks_inner(update: Update, context: ContextTypes.DEFAULT_
 
         plan_info = db.get_plan_by_id(plan_row_id)
         if not plan_info:
-            await safe_answer(query, "âŒ Ye product/plan ab available nahi hai.", show_alert=True)
+            await safe_answer(query, "❌ Ye product/plan ab available nahi hai.", show_alert=True)
             return
 
         category = plan_info["category"]
@@ -2269,12 +2268,12 @@ async def _handle_callbacks_inner(update: Update, context: ContextTypes.DEFAULT_
         balance = db.get_balance(user_id)
         
         if balance < price:
-            await safe_answer(query, f"âŒ Insufficient Balance! Need â‚¹{price}, You have â‚¹{balance}", show_alert=True)
+            await safe_answer(query, f"❌ Insufficient Balance! Need ₹{price}, You have ₹{balance}", show_alert=True)
             text = f"""
-<tg-emoji emoji-id="6010080962883361959">â­</tg-emoji> <b>INSUFFICIENT BALANCE!</b>
+<tg-emoji emoji-id="6010080962883361959">⭐</tg-emoji> <b>INSUFFICIENT BALANCE!</b>
 
-ðŸ’¸ Required: <b>â‚¹{price}</b>
-<tg-emoji emoji-id="6010080962883361959">â­</tg-emoji> Your Balance: <b>â‚¹{balance}</b>
+💸 Required: <b>₹{price}</b>
+<tg-emoji emoji-id="6010080962883361959">⭐</tg-emoji> Your Balance: <b>₹{balance}</b>
 
 Please add balance first.
 """
@@ -2305,21 +2304,21 @@ Please add balance first.
         
         # UI update first to prevent double tap visually
         try:
-            await safe_edit(query, text='<tg-emoji emoji-id="6070873970100409600">â³</tg-emoji> <b>Processing your order... Please wait.</b>', reply_markup=None, parse_mode="HTML")
+            await safe_edit(query, text='<tg-emoji emoji-id="6070873970100409600">⏳</tg-emoji> <b>Processing your order... Please wait.</b>', reply_markup=None, parse_mode="HTML")
         except:
             pass
             
         if db.deduct_balance(user_id, price):
             try:
-                await update.message.reply_text("â³ <b>Processing your purchase... Please wait!</b>\n\n<i>API is generating your key...</i>", parse_mode="HTML")
+                await update.message.reply_text("⏳ <b>Processing your purchase... Please wait!</b>\n\n<i>API is generating your key...</i>", parse_mode="HTML")
             except:
                 pass
             if plan_info.get("is_manual"):
                 license_key = db.get_manual_key(product_id, plan_name)
                 if not license_key:
                     db.update_balance(user_id, price)
-                    await safe_answer(query, "âŒ Out of stock! No keys available.", show_alert=True)
-                    text = f"âŒ <b>OUT OF STOCK!</b>\n\nIs product ki keys abhi available nahi hain. Balance wapas kar diya gaya hai."
+                    await safe_answer(query, "❌ Out of stock! No keys available.", show_alert=True)
+                    text = f"❌ <b>OUT OF STOCK!</b>\n\nIs product ki keys abhi available nahi hain. Balance wapas kar diya gaya hai."
                     keyboard = [[CB("Back", style="danger", icon=get_button_emoji("back"), callback_data=encode_cb("prod", category, prod_name))]]
                     await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
                     return
@@ -2331,8 +2330,8 @@ Please add balance first.
                 admin_user = db.db.users.find_one({"user_id": str(ADMIN_ID)})
                 admin_username = f"@{admin_user['username']}" if admin_user and admin_user.get("username") else "the Owner"
                 
-                await safe_answer(query, f"âŒ Purchase Failed: Server problem", show_alert=True)
-                text = f"âŒ <b>PURCHASE FAILED!</b>\n\nServer problem, contact owner {admin_username}\n\nðŸ’° Your balance has been refunded."
+                await safe_answer(query, f"❌ Purchase Failed: Server problem", show_alert=True)
+                text = f"❌ <b>PURCHASE FAILED!</b>\n\nServer problem, contact owner {admin_username}\n\n💰 Your balance has been refunded."
                 keyboard = [[CB("Back", style="danger", icon=get_button_emoji("back"), callback_data=encode_cb("prod", category, prod_name))]]
                 await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
                 return
@@ -2343,12 +2342,12 @@ Please add balance first.
                 import requests
                 from datetime import datetime
                 admin_msg = (
-                    f"ðŸ› <b>NEW KEY PURCHASED!</b>\n\n"
-                    f"ðŸ‘¤ <b>User:</b> @{query.from_user.username or 'N/A'} (<code>{user_id}</code>)\n"
-                    f"ðŸ›ï¸ <b>Product:</b> {prod_name} - {plan_name}\n"
-                    f"ðŸ’µ <b>Paid:</b> â‚¹{price}\n"
-                    f"ðŸ”‘ <b>Key:</b> <code>{license_key}</code>\n"
-                    f"ðŸ•’ <b>Time:</b> {datetime.now().strftime('%d-%m-%Y %I:%M %p')}"
+                    f"🛍 <b>NEW KEY PURCHASED!</b>\n\n"
+                    f"👤 <b>User:</b> @{query.from_user.username or 'N/A'} (<code>{user_id}</code>)\n"
+                    f"🛍️ <b>Product:</b> {prod_name} - {plan_name}\n"
+                    f"💵 <b>Paid:</b> ₹{price}\n"
+                    f"🔑 <b>Key:</b> <code>{license_key}</code>\n"
+                    f"🕒 <b>Time:</b> {datetime.now().strftime('%d-%m-%Y %I:%M %p')}"
                 )
                 requests.post(
                     f"https://api.telegram.org/bot{TOKEN}/sendMessage",
@@ -2359,16 +2358,16 @@ Please add balance first.
                 print("Admin Notify Error (Reg):", e)
             
             text = f"""
-ðŸŽ‰ <b>PURCHASE SUCCESSFUL!</b> âœ¨
+🎉 <b>PURCHASE SUCCESSFUL!</b> ✨
 
-ðŸ›ï¸ <b>Product:</b> {prod_name}
-â³ <b>Validity:</b> {plan_name}
-ðŸ’Ž <b>Price:</b> â‚¹{price}
+🛍️ <b>Product:</b> {prod_name}
+⏳ <b>Validity:</b> {plan_name}
+💎 <b>Price:</b> ₹{price}
 
-ðŸ‘‘ <b>YOUR LICENSE KEY:</b>
+👑 <b>YOUR LICENSE KEY:</b>
 <code>{license_key}</code>
 
-âœ… <b>Key saved to your history!</b>
+✅ <b>Key saved to your history!</b>
 """
             keyboard = [[CB("Main Menu", style="primary", icon=get_button_emoji("shop"), callback_data="back_to_menu")]]
             await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
@@ -2386,19 +2385,19 @@ Please add balance first.
                     try: await context.bot.send_voice(chat_id=query.message.chat_id, voice=voice_id)
                     except Exception: pass
                 if link:
-                    try: await context.bot.send_message(chat_id=query.message.chat_id, text=f"ðŸ”— <b>Product Link:</b>\n{link}", parse_mode="HTML")
+                    try: await context.bot.send_message(chat_id=query.message.chat_id, text=f"🔗 <b>Product Link:</b>\n{link}", parse_mode="HTML")
                     except Exception: pass
 
         else:
-            await safe_answer(query, "âŒ Insufficient balance!", show_alert=True)
+            await safe_answer(query, "❌ Insufficient balance!", show_alert=True)
 
     elif data == "cancel_purchase":
         context.user_data["awaiting_android_id"] = False
         context.user_data["pending_product"] = None
-        await safe_edit(query, "âŒ Purchase cancelled.")
+        await safe_edit(query, "❌ Purchase cancelled.")
         # Go back to shop
         products = db.get_products()
-        text = f"<b>ðŸ“Š HACK STORE â€” SHOP ðŸ’­</b>\n\n<tg-emoji emoji-id=\"6070873970100409600\">â­</tg-emoji> <b>Choose your device category:</b>"
+        text = f"<b>📊 HACK STORE — SHOP 💭</b>\n\n<tg-emoji emoji-id=\"6070873970100409600\">⭐</tg-emoji> <b>Choose your device category:</b>"
         keyboard = []
         for cat in products.keys():
             cb = encode_cb("cat", cat)
@@ -2409,14 +2408,14 @@ Please add balance first.
     elif data == "menu_profile":
         user_data = db.get_user(user_id)
         balance = db.get_balance(user_id)
-        reseller_line = f"\nðŸ‘‘ <b>Status:</b> Reseller ({RESELLER_DISCOUNT_PERCENT}% OFF)" if db.is_reseller(user_id) else ""
-        default_prof = "<tg-emoji emoji-id=\"6071074330324768982\">â­</tg-emoji> <b>MY ACCOUNT PROFILE</b>"
+        reseller_line = f"\n👑 <b>Status:</b> Reseller ({RESELLER_DISCOUNT_PERCENT}% OFF)" if db.is_reseller(user_id) else ""
+        default_prof = "<tg-emoji emoji-id=\"6071074330324768982\">⭐</tg-emoji> <b>MY ACCOUNT PROFILE</b>"
         db_text = get_text_safe("profile", default_prof)
         text = f"""{db_text}
 
-ðŸ‘¤ <b>Username:</b> @{user_data[1] if user_data else 'User'}
-ðŸ†” <b>User ID:</b> <code>{user_id}</code>
-<tg-emoji emoji-id="6010080962883361959">â­</tg-emoji> <b>Wallet Balance:</b> <b>â‚¹{balance}</b>{reseller_line}
+👤 <b>Username:</b> @{user_data[1] if user_data else 'User'}
+🆔 <b>User ID:</b> <code>{user_id}</code>
+<tg-emoji emoji-id="6010080962883361959">⭐</tg-emoji> <b>Wallet Balance:</b> <b>₹{balance}</b>{reseller_line}
 """
         keyboard = [[CB("Back to Menu", style="primary", icon=get_button_emoji("back"), callback_data="back_to_menu")]]
         await send_screen(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), screen_key="profile", parse_mode="HTML")
@@ -2424,35 +2423,35 @@ Please add balance first.
     elif data == "transfer_balance_start":
         context.user_data["awaiting_transfer_userid"] = True
         context.user_data["awaiting_transfer_amount"] = False
-        text = get_text_safe("transfer_caption", "ðŸ’¸ <b>USER TO USER BALANCE TRANSFER</b>\n\nPlease enter the <b>User ID or @Username</b> of the person you want to send money to:\n(Type /cancel to abort)")
+        text = get_text_safe("transfer_caption", "💸 <b>USER TO USER BALANCE TRANSFER</b>\n\nPlease enter the <b>User ID or @Username</b> of the person you want to send money to:\n(Type /cancel to abort)")
         keyboard = [[CB("Cancel", style="danger", icon=get_button_emoji("cancel"), callback_data="back_to_menu")]]
         await safe_edit(query, text, InlineKeyboardMarkup(keyboard), parse_mode="HTML")
 
     elif data == "menu_history":
         import html
         # Premium Emoji IDs
-        ORDER_EMOJI = "6070878939377571385"          # ðŸ“œ â€” Header
-        PRODUCT_EMOJI = "6176966310920983412"        # ðŸ›’ â€” Product ke aage
-        KEY_EMOJI = "5465443379917629504"            # ðŸ’Ž â€” Key ke aage (NEW)
+        ORDER_EMOJI = "6070878939377571385"          # 📜 — Header
+        PRODUCT_EMOJI = "6176966310920983412"        # 🛒 — Product ke aage
+        KEY_EMOJI = "5465443379917629504"            # 💎 — Key ke aage (NEW)
         
         history = db.get_history(user_id, 10)
         
         if not history:
             text = f"""<blockquote>
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
-<tg-emoji emoji-id="{ORDER_EMOJI}">ðŸ“œ</tg-emoji> <b>ORDER HISTORY</b>
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+━━━━━━━━━━━━━━━━━━━━
+<tg-emoji emoji-id="{ORDER_EMOJI}">📜</tg-emoji> <b>ORDER HISTORY</b>
+━━━━━━━━━━━━━━━━━━━━
 
-âŒ No orders yet.
+❌ No orders yet.
 
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+━━━━━━━━━━━━━━━━━━━━
 </blockquote>"""
         else:
             lines = [
                 "<blockquote>",
-                "â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”",
-                f'<tg-emoji emoji-id="{ORDER_EMOJI}">ðŸ“œ</tg-emoji> <b>ORDER HISTORY</b>',
-                "â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”",
+                "━━━━━━━━━━━━━━━━━━━━",
+                f'<tg-emoji emoji-id="{ORDER_EMOJI}">📜</tg-emoji> <b>ORDER HISTORY</b>',
+                "━━━━━━━━━━━━━━━━━━━━",
                 ""
             ]
             
@@ -2463,13 +2462,13 @@ Please add balance first.
                 safe_key = html.escape(str(item[5]))
                 safe_android = html.escape(str(item[6])) if len(item) > 6 and item[6] else ""
                 
-                lines.append(f'<tg-emoji emoji-id="{PRODUCT_EMOJI}">ðŸ›’</tg-emoji> {safe_prod} ({safe_plan}) â€” â‚¹{price}')
-                lines.append(f'<tg-emoji emoji-id="{KEY_EMOJI}">ðŸ’Ž</tg-emoji> <code>{safe_key}</code>')
+                lines.append(f'<tg-emoji emoji-id="{PRODUCT_EMOJI}">🛒</tg-emoji> {safe_prod} ({safe_plan}) — ₹{price}')
+                lines.append(f'<tg-emoji emoji-id="{KEY_EMOJI}">💎</tg-emoji> <code>{safe_key}</code>')
                 if safe_android:
-                    lines.append(f'ðŸ“± Android ID: <code>{safe_android}</code>')
+                    lines.append(f'📱 Android ID: <code>{safe_android}</code>')
                 lines.append("")
             
-            lines.append("â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”")
+            lines.append("━━━━━━━━━━━━━━━━━━━━")
             lines.append("</blockquote>")
             
             text = "\n".join(lines)
@@ -2479,31 +2478,31 @@ Please add balance first.
 
     elif data == "menu_deposit_history":
         # Premium Emoji IDs
-        HEADER_EMOJI = "6091170843080007327"   # ðŸ’°
-        SEP_EMOJI = "6307665627481903641"      # âž–
-        TOTAL_EMOJI = "6244678063775289843"    # âš¡
-        AMOUNT_EMOJI = "6237742262822901946"   # âš¡
-        ID_EMOJI = "5888781182249738113"       # ðŸ†”
-        DATE_EMOJI = "5274055917766202507"     # ðŸ“…
-        UTR_EMOJI = "5310228579009699834"      # ðŸ”‘
-        USER_EMOJI = "4967667085606912536"     # ðŸ‘¤
+        HEADER_EMOJI = "6091170843080007327"   # 💰
+        SEP_EMOJI = "6307665627481903641"      # ➖
+        TOTAL_EMOJI = "6244678063775289843"    # ⚡
+        AMOUNT_EMOJI = "6237742262822901946"   # ⚡
+        ID_EMOJI = "5888781182249738113"       # 🆔
+        DATE_EMOJI = "5274055917766202507"     # 📅
+        UTR_EMOJI = "5310228579009699834"      # 🔑
+        USER_EMOJI = "4967667085606912536"     # 👤
 
         raw_history = db.get_deposit_history(user_id, 10)
         history = [row for row in raw_history if (row[4] if len(row)>4 and row[4] else "completed") == "completed"]
         
         if not history:
             text = f"""<blockquote>
-<tg-emoji emoji-id="{HEADER_EMOJI}">ðŸ’°</tg-emoji> <b>DEPOSIT HISTORY</b>
-âŒ No successful deposits yet
+<tg-emoji emoji-id="{HEADER_EMOJI}">💰</tg-emoji> <b>DEPOSIT HISTORY</b>
+❌ No successful deposits yet
 </blockquote>"""
         else:
             total_deposits = sum(row[1] for row in history)
             
             lines = [
                 "<blockquote>",
-                f'<tg-emoji emoji-id="{HEADER_EMOJI}">ðŸ’°</tg-emoji> <b>DEPOSIT HISTORY</b>',
-                f'<tg-emoji emoji-id="{SEP_EMOJI}">âž–</tg-emoji>' * 12,
-                f'<tg-emoji emoji-id="{TOTAL_EMOJI}">âš¡</tg-emoji> <b>Total:</b> â‚¹{total_deposits:.2f}',
+                f'<tg-emoji emoji-id="{HEADER_EMOJI}">💰</tg-emoji> <b>DEPOSIT HISTORY</b>',
+                f'<tg-emoji emoji-id="{SEP_EMOJI}">➖</tg-emoji>' * 12,
+                f'<tg-emoji emoji-id="{TOTAL_EMOJI}">⚡</tg-emoji> <b>Total:</b> ₹{total_deposits:.2f}',
                 ""
             ]
             
@@ -2515,14 +2514,14 @@ Please add balance first.
                 timestamp = row[5] if len(row) > 5 and row[5] else ""
                 date_str = timestamp[:16] if timestamp else "N/A"
                 
-                lines.append(f'<tg-emoji emoji-id="{AMOUNT_EMOJI}">âš¡</tg-emoji> â‚¹{amount:.2f}')
-                lines.append(f'   <tg-emoji emoji-id="{ID_EMOJI}">ðŸ†”</tg-emoji> {order_id}')
-                lines.append(f'   <tg-emoji emoji-id="{DATE_EMOJI}">ðŸ“…</tg-emoji> {date_str}')
-                lines.append(f'   <tg-emoji emoji-id="{UTR_EMOJI}">ðŸ”‘</tg-emoji> {utr}')
-                lines.append(f'   <tg-emoji emoji-id="{USER_EMOJI}">ðŸ‘¤</tg-emoji> {sender}')
+                lines.append(f'<tg-emoji emoji-id="{AMOUNT_EMOJI}">⚡</tg-emoji> ₹{amount:.2f}')
+                lines.append(f'   <tg-emoji emoji-id="{ID_EMOJI}">🆔</tg-emoji> {order_id}')
+                lines.append(f'   <tg-emoji emoji-id="{DATE_EMOJI}">📅</tg-emoji> {date_str}')
+                lines.append(f'   <tg-emoji emoji-id="{UTR_EMOJI}">🔑</tg-emoji> {utr}')
+                lines.append(f'   <tg-emoji emoji-id="{USER_EMOJI}">👤</tg-emoji> {sender}')
                 lines.append("")
             
-            lines.append(f'<tg-emoji emoji-id="{SEP_EMOJI}">âž–</tg-emoji>' * 20)
+            lines.append(f'<tg-emoji emoji-id="{SEP_EMOJI}">➖</tg-emoji>' * 20)
             lines.append("</blockquote>")
             
             text = "\n".join(lines)
@@ -2531,28 +2530,28 @@ Please add balance first.
         await send_screen(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), screen_key="deposit_history", parse_mode="HTML")
 
     elif data == "menu_tutorial":
-        text = get_text_safe("tutorial", "ðŸ“š <b>Tutorial</b>\\n\\nHow to use the bot.")
+        text = get_text_safe("tutorial", "📚 <b>Tutorial</b>\\n\\nHow to use the bot.")
         keyboard = [[CB("Back to Menu", style="primary", icon=get_button_emoji("back"), callback_data="back_to_menu")]]
         await send_screen(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), screen_key="tutorial", parse_mode="HTML")
 
     elif data == "menu_support":
-        text = get_text_safe("support", "ðŸ’¬ <b>Support</b>\\n\\nContact admin for help.")
+        text = get_text_safe("support", "💬 <b>Support</b>\\n\\nContact admin for help.")
         keyboard = [[CB("Back to Menu", style="primary", icon=get_button_emoji("back"), callback_data="back_to_menu")]]
         await send_screen(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), screen_key="support", parse_mode="HTML")
 
     elif data == "menu_download":
-        text = get_text_safe("download", "ðŸ“¥ <b>Download</b>\\n\\nDownload links coming soon.")
+        text = get_text_safe("download", "📥 <b>Download</b>\\n\\nDownload links coming soon.")
         keyboard = [[CB("Back to Menu", style="primary", icon=get_button_emoji("back"), callback_data="back_to_menu")]]
         await send_screen(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), screen_key="download", parse_mode="HTML")
 
     elif data == "menu_referral":
-        # Premium Emoji IDs â€” Aapki di hui
-        STAR_EMOJI = "6242413641052722528"      # â­
-        MONEY_EMOJI = "6276133811545706331"     # ðŸ’¸
-        LINK_EMOJI = "6100657257605763582"      # ðŸ”—
-        USER_EMOJI = "4967667085606912536"      # ðŸ‘¥
-        COIN_EMOJI = "6235445786759402354"      # ðŸ’°
-        MEGAPHONE_EMOJI = "5328175963144466763" # ðŸ“¢
+        # Premium Emoji IDs — Aapki di hui
+        STAR_EMOJI = "6242413641052722528"      # ⭐
+        MONEY_EMOJI = "6276133811545706331"     # 💸
+        LINK_EMOJI = "6100657257605763582"      # 🔗
+        USER_EMOJI = "4967667085606912536"      # 👥
+        COIN_EMOJI = "6235445786759402354"      # 💰
+        MEGAPHONE_EMOJI = "5328175963144466763" # 📢
         
         # Database se real data lo
         total_refs = db.db.users.count_documents({"referred_by": user_id})
@@ -2568,20 +2567,20 @@ Please add balance first.
         referral_link = f"https://t.me/{bot_username}?start=ref_{user_id}"
         
         text = f"""<blockquote>
-â•­â”â”â”â”ã€” <tg-emoji emoji-id="{STAR_EMOJI}">â­</tg-emoji> REFERRAL PROGRAM ã€•â”â”â”â”â•®
+╭━━━━〔 <tg-emoji emoji-id="{STAR_EMOJI}">⭐</tg-emoji> REFERRAL PROGRAM 〕━━━━╮
                                    
-<tg-emoji emoji-id="{MONEY_EMOJI}">ðŸ’¸</tg-emoji> Apne friends ko refer karo aur
+<tg-emoji emoji-id="{MONEY_EMOJI}">💸</tg-emoji> Apne friends ko refer karo aur
    unke har recharge par earning karo!
                                    
-<tg-emoji emoji-id="{LINK_EMOJI}">ðŸ”—</tg-emoji> <b>Your Referral Link:</b>
+<tg-emoji emoji-id="{LINK_EMOJI}">🔗</tg-emoji> <b>Your Referral Link:</b>
 <code>{referral_link}</code>
                                    
-<tg-emoji emoji-id="{USER_EMOJI}">ðŸ‘¥</tg-emoji> <b>Total Referrals:</b> {total_refs}
-<tg-emoji emoji-id="{COIN_EMOJI}">ðŸ’°</tg-emoji> <b>Total Earnings:</b> â‚¹{total_earnings:.2f}
+<tg-emoji emoji-id="{USER_EMOJI}">👥</tg-emoji> <b>Total Referrals:</b> {total_refs}
+<tg-emoji emoji-id="{COIN_EMOJI}">💰</tg-emoji> <b>Total Earnings:</b> ₹{total_earnings:.2f}
                                    
-<tg-emoji emoji-id="{MEGAPHONE_EMOJI}">ðŸ“¢</tg-emoji> Link share karo â€¢ Refer karo â€¢ Earn karo!
+<tg-emoji emoji-id="{MEGAPHONE_EMOJI}">📢</tg-emoji> Link share karo • Refer karo • Earn karo!
                                    
-â•°â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â•¯
+╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
 </blockquote>"""
         
         keyboard = [[CB("Back to Menu", style="primary", icon=get_button_emoji("back"), callback_data="back_to_menu")]]
@@ -2589,27 +2588,27 @@ Please add balance first.
         await send_screen(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), screen_key="referral", parse_mode="HTML")
 
     elif data == "menu_add_balance":
-        COIN_EMOJI = "6089118454302909415"      # ðŸª™
-        MONEY_EMOJI = "6334784630809435068"     # ðŸ’°
-        BOLT_EMOJI = "6276133811545706331"      # âš¡
-        ARROW_EMOJI = "6091231303334633875"     # âž¡ï¸
-        CASH_EMOJI = "6332078964621712044"      # ðŸ’µ
+        COIN_EMOJI = "6089118454302909415"      # 🪙
+        MONEY_EMOJI = "6334784630809435068"     # 💰
+        BOLT_EMOJI = "6276133811545706331"      # ⚡
+        ARROW_EMOJI = "6091231303334633875"     # ➡️
+        CASH_EMOJI = "6332078964621712044"      # 💵
         
         context.user_data["kp_amt"] = ""
         
         text = f"""<blockquote>
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
-<tg-emoji emoji-id="{COIN_EMOJI}">ðŸª™</tg-emoji> <b>ADD FUNDS TO WALLET</b>
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+━━━━━━━━━━━━━━━━━━━━
+<tg-emoji emoji-id="{COIN_EMOJI}">🪙</tg-emoji> <b>ADD FUNDS TO WALLET</b>
+━━━━━━━━━━━━━━━━━━━━
 
-<tg-emoji emoji-id="{MONEY_EMOJI}">ðŸ’°</tg-emoji> Choose a quick amount to add
+<tg-emoji emoji-id="{MONEY_EMOJI}">💰</tg-emoji> Choose a quick amount to add
    or type/use a custom one below.
 
-<tg-emoji emoji-id="{BOLT_EMOJI}">âš¡</tg-emoji> Predefined amounts are faster to process!
+<tg-emoji emoji-id="{BOLT_EMOJI}">⚡</tg-emoji> Predefined amounts are faster to process!
 
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+━━━━━━━━━━━━━━━━━━━━
 
-<tg-emoji emoji-id="{ARROW_EMOJI}">âž¡ï¸</tg-emoji> <b>Amount:</b> â‚¹0 <tg-emoji emoji-id="{CASH_EMOJI}">ðŸ’µ</tg-emoji>
+<tg-emoji emoji-id="{ARROW_EMOJI}">➡️</tg-emoji> <b>Amount:</b> ₹0 <tg-emoji emoji-id="{CASH_EMOJI}">💵</tg-emoji>
 </blockquote>"""
         
         if query.message.photo or query.message.video:
@@ -2629,28 +2628,28 @@ Please add balance first.
             current = ""
         elif action == "confirm":
             if not current or not current.isdigit() or int(current) <= 0:
-                await safe_answer(query, "âŒ Please enter a valid amount!", show_alert=True)
+                await safe_answer(query, "❌ Please enter a valid amount!", show_alert=True)
                 return
             
             original_amount = int(current)
             if original_amount < MIN_AMOUNT:
-                await safe_answer(query, f"âŒ Minimum amount is â‚¹{MIN_AMOUNT}", show_alert=True)
+                await safe_answer(query, f"❌ Minimum amount is ₹{MIN_AMOUNT}", show_alert=True)
                 return
             
             EMOJI_ID = "6129812419028982717"
             text = f"""<blockquote>
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+━━━━━━━━━━━━━━━━━━━━
 <b>PAYMENT OPTIONS</b>
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+━━━━━━━━━━━━━━━━━━━━
 
 PhonePe / GooglePay Payment Available
 
-à¤…à¤—à¤° à¤•à¤¿à¤¸à¥€ à¤à¤• Payment Option à¤¸à¥‡ Payment Failed à¤¹à¥‹,
-à¤¤à¥‹ à¤¦à¥‚à¤¸à¤°à¤¾ Option Select à¤•à¤°à¤•à¥‡ Payment à¤•à¤°à¥‡à¤‚.
+अगर किसी एक Payment Option से Payment Failed हो,
+तो दूसरा Option Select करके Payment करें.
 
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
-<tg-emoji emoji-id="{EMOJI_ID}">ðŸ’³</tg-emoji>
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+━━━━━━━━━━━━━━━━━━━━
+<tg-emoji emoji-id="{EMOJI_ID}">💳</tg-emoji>
+━━━━━━━━━━━━━━━━━━━━
 </blockquote>"""
             keyboard = [
                 [
@@ -2666,25 +2665,25 @@ PhonePe / GooglePay Payment Available
 
         context.user_data["kp_amt"] = current
         display_amt = current if current else "0"
-        COIN_EMOJI = "6089118454302909415"      # ðŸª™
-        MONEY_EMOJI = "6334784630809435068"     # ðŸ’°
-        BOLT_EMOJI = "6276133811545706331"      # âš¡
-        ARROW_EMOJI = "6091231303334633875"     # âž¡ï¸
-        CASH_EMOJI = "6332078964621712044"      # ðŸ’µ
+        COIN_EMOJI = "6089118454302909415"      # 🪙
+        MONEY_EMOJI = "6334784630809435068"     # 💰
+        BOLT_EMOJI = "6276133811545706331"      # ⚡
+        ARROW_EMOJI = "6091231303334633875"     # ➡️
+        CASH_EMOJI = "6332078964621712044"      # 💵
         
         text = f"""<blockquote>
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
-<tg-emoji emoji-id="{COIN_EMOJI}">ðŸª™</tg-emoji> <b>ADD FUNDS TO WALLET</b>
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+━━━━━━━━━━━━━━━━━━━━
+<tg-emoji emoji-id="{COIN_EMOJI}">🪙</tg-emoji> <b>ADD FUNDS TO WALLET</b>
+━━━━━━━━━━━━━━━━━━━━
 
-<tg-emoji emoji-id="{MONEY_EMOJI}">ðŸ’°</tg-emoji> Choose a quick amount to add
+<tg-emoji emoji-id="{MONEY_EMOJI}">💰</tg-emoji> Choose a quick amount to add
    or type/use a custom one below.
 
-<tg-emoji emoji-id="{BOLT_EMOJI}">âš¡</tg-emoji> Predefined amounts are faster to process!
+<tg-emoji emoji-id="{BOLT_EMOJI}">⚡</tg-emoji> Predefined amounts are faster to process!
 
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+━━━━━━━━━━━━━━━━━━━━
 
-<tg-emoji emoji-id="{ARROW_EMOJI}">âž¡ï¸</tg-emoji> <b>Amount:</b> â‚¹{display_amt} <tg-emoji emoji-id="{CASH_EMOJI}">ðŸ’µ</tg-emoji>
+<tg-emoji emoji-id="{ARROW_EMOJI}">➡️</tg-emoji> <b>Amount:</b> ₹{display_amt} <tg-emoji emoji-id="{CASH_EMOJI}">💵</tg-emoji>
 </blockquote>"""
         try:
             await safe_edit(query, text=text, reply_markup=get_numeric_keypad(), parse_mode="HTML")
@@ -2699,13 +2698,13 @@ PhonePe / GooglePay Payment Available
         order_id = f"{order_prefix}{datetime.now().strftime('%Y%m%d%H%M%S')}{uuid.uuid4().hex[:4].upper()}"
         customer_name = query.from_user.full_name or f"User{user_id}"
 
-        logger.info(f"ðŸ‘¤ User {user_id} ({customer_name}) requested â‚¹{original_amount} top-up â†’ order {order_id}")
-        await safe_answer(query, "â³ Creating your payment link...")
+        logger.info(f"👤 User {user_id} ({customer_name}) requested ₹{original_amount} top-up → order {order_id}")
+        await safe_answer(query, "⏳ Creating your payment link...")
         payment_url, upi_url, err = await asyncio.to_thread(create_karanpay_order, original_amount, order_id, customer_name)
         if not payment_url:
-            logger.error(f"âŒ KaranPay order creation failed for user {user_id}: {err}")
+            logger.error(f"❌ KaranPay order creation failed for user {user_id}: {err}")
             await safe_answer(query, 
-                "âŒ Payment order create nahi ho paaya. Error: " + str(err),
+                "❌ Payment order create nahi ho paaya. Error: " + str(err),
                 show_alert=True
             )
             return
@@ -2715,13 +2714,13 @@ PhonePe / GooglePay Payment Available
         db.create_order(order_id, user_id, original_amount)
 
         text_msg = f"""
-<tg-emoji emoji-id="6215156189454409086">ðŸ’°</tg-emoji> <b>Amount: â‚¹{original_amount:.2f}</b>
-<tg-emoji emoji-id="5334890573281114250">ðŸ†”</tg-emoji> <b>Order ID: <code>{order_id}</code></b>
-â° <b>Expires: {expiry_time}</b>
+<tg-emoji emoji-id="6215156189454409086">💰</tg-emoji> <b>Amount: ₹{original_amount:.2f}</b>
+<tg-emoji emoji-id="5334890573281114250">🆔</tg-emoji> <b>Order ID: <code>{order_id}</code></b>
+⏰ <b>Expires: {expiry_time}</b>
 
-ðŸ“Š <b>Scan the QR or tap "Pay Now" to open the secure payment page.</b>
+📊 <b>Scan the QR or tap "Pay Now" to open the secure payment page.</b>
 
-âš ï¸ <b>Important:</b> Pay exact amount <b>â‚¹{original_amount:.2f}</b>
+⚠️ <b>Important:</b> Pay exact amount <b>₹{original_amount:.2f}</b>
 """
         keyboard = [
             [CB("Verify Payment", style="success", icon=get_button_emoji("confirm"), callback_data=f"verify_{order_id}")],
@@ -2741,7 +2740,7 @@ PhonePe / GooglePay Payment Available
                 await context.bot.send_message(chat_id=query.message.chat_id, text=text_msg, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
         except Exception as e:
             logger.error(f"Failed to send payment message: {e}")
-            await safe_answer(query, "âŒ Message bhej nahi paya, dobara try karo.", show_alert=True)
+            await safe_answer(query, "❌ Message bhej nahi paya, dobara try karo.", show_alert=True)
             return
 
         try:
@@ -2755,31 +2754,31 @@ PhonePe / GooglePay Payment Available
         order = db.get_order(order_id)
     
         if not order:
-            await safe_answer(query, "âŒ Order not found!", show_alert=True)
+            await safe_answer(query, "❌ Order not found!", show_alert=True)
             return
     
         if order[3] == "completed":
-            await safe_answer(query, "âœ… Already verified!", show_alert=True)
+            await safe_answer(query, "✅ Already verified!", show_alert=True)
             utr = order[4]
             sender = order[5]
             amount = order[2]
             default_msg = f"""<blockquote>
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
-<tg-emoji emoji-id="6235234890980269200">âœ…</tg-emoji> <b>PAYMENT VERIFIED SUCCESSFULLY</b>
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+━━━━━━━━━━━━━━━━━━━━
+<tg-emoji emoji-id="6235234890980269200">✅</tg-emoji> <b>PAYMENT VERIFIED SUCCESSFULLY</b>
+━━━━━━━━━━━━━━━━━━━━
 
 Your payment has been successfully verified and instantly processed by our system.
 
 <b>Transaction Details:</b>
-<tg-emoji emoji-id="5334890573281114250">ðŸ†”</tg-emoji> <b>Order ID:</b> <code>{{order_id}}</code>
-<tg-emoji emoji-id="6156533171513986360">ðŸ’°</tg-emoji> <b>Amount Paid:</b> â‚¹{{amount:.2f}}
-<tg-emoji emoji-id="6034969813032374911">ðŸ§¾</tg-emoji> <b>UTR / Ref No:</b> <code>{{utr}}</code>
-<tg-emoji emoji-id="6276133811545706331">ðŸ‘¤</tg-emoji> <b>Payer Name:</b> {{sender}}
+<tg-emoji emoji-id="5334890573281114250">🆔</tg-emoji> <b>Order ID:</b> <code>{{order_id}}</code>
+<tg-emoji emoji-id="6156533171513986360">💰</tg-emoji> <b>Amount Paid:</b> ₹{{amount:.2f}}
+<tg-emoji emoji-id="6034969813032374911">🧾</tg-emoji> <b>UTR / Ref No:</b> <code>{{utr}}</code>
+<tg-emoji emoji-id="6276133811545706331">👤</tg-emoji> <b>Payer Name:</b> {{sender}}
 
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
-<tg-emoji emoji-id="6033106828018062225">ðŸ’¸</tg-emoji> <b>â‚¹{{amount:.2f}}</b> has been added to your wallet balance!
+━━━━━━━━━━━━━━━━━━━━
+<tg-emoji emoji-id="6033106828018062225">💸</tg-emoji> <b>₹{{amount:.2f}}</b> has been added to your wallet balance!
 You can now proceed to purchase your desired products from the Store.
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+━━━━━━━━━━━━━━━━━━━━
 </blockquote>"""
             msg = get_text_safe("add_success_msg", default_msg).format(
                 order_id=order_id, amount=amount, utr=utr, sender=sender
@@ -2793,7 +2792,7 @@ You can now proceed to purchase your desired products from the Store.
                     pass
             return
 
-        await safe_answer(query, "â³ Checking payment...")
+        await safe_answer(query, "⏳ Checking payment...")
 
         result = await asyncio.to_thread(check_karanpay_status, order_id)
         if result:
@@ -2806,22 +2805,22 @@ You can now proceed to purchase your desired products from the Store.
                 db.add_deposit_history(user_id_o, order_id, paid_amount, utr, sender)
                 await asyncio.to_thread(notify_admin_deposit, user_id_o, order_id, paid_amount, utr, sender)
             default_msg = f"""<blockquote>
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
-<tg-emoji emoji-id="6235234890980269200">âœ…</tg-emoji> <b>PAYMENT VERIFIED SUCCESSFULLY</b>
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+━━━━━━━━━━━━━━━━━━━━
+<tg-emoji emoji-id="6235234890980269200">✅</tg-emoji> <b>PAYMENT VERIFIED SUCCESSFULLY</b>
+━━━━━━━━━━━━━━━━━━━━
 
 Your payment has been successfully verified and instantly processed by our system.
 
 <b>Transaction Details:</b>
-<tg-emoji emoji-id="5334890573281114250">ðŸ†”</tg-emoji> <b>Order ID:</b> <code>{{order_id}}</code>
-<tg-emoji emoji-id="6156533171513986360">ðŸ’°</tg-emoji> <b>Amount Paid:</b> â‚¹{{amount:.2f}}
-<tg-emoji emoji-id="6034969813032374911">ðŸ§¾</tg-emoji> <b>UTR / Ref No:</b> <code>{{utr}}</code>
-<tg-emoji emoji-id="6276133811545706331">ðŸ‘¤</tg-emoji> <b>Payer Name:</b> {{sender}}
+<tg-emoji emoji-id="5334890573281114250">🆔</tg-emoji> <b>Order ID:</b> <code>{{order_id}}</code>
+<tg-emoji emoji-id="6156533171513986360">💰</tg-emoji> <b>Amount Paid:</b> ₹{{amount:.2f}}
+<tg-emoji emoji-id="6034969813032374911">🧾</tg-emoji> <b>UTR / Ref No:</b> <code>{{utr}}</code>
+<tg-emoji emoji-id="6276133811545706331">👤</tg-emoji> <b>Payer Name:</b> {{sender}}
 
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
-<tg-emoji emoji-id="6033106828018062225">ðŸ’¸</tg-emoji> <b>â‚¹{{amount:.2f}}</b> has been added to your wallet balance!
+━━━━━━━━━━━━━━━━━━━━
+<tg-emoji emoji-id="6033106828018062225">💸</tg-emoji> <b>₹{{amount:.2f}}</b> has been added to your wallet balance!
 You can now proceed to purchase your desired products from the Store.
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+━━━━━━━━━━━━━━━━━━━━
 </blockquote>"""
             msg = get_text_safe("add_success_msg", default_msg).format(
                 order_id=order_id, amount=paid_amount, utr=utr, sender=sender
@@ -2836,12 +2835,12 @@ You can now proceed to purchase your desired products from the Store.
             return
 
         msg = f"""
-<tg-emoji emoji-id="6070873970100409600">â­</tg-emoji> <b>PAYMENT VERIFICATION</b>
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
-<tg-emoji emoji-id="5334890573281114250">ðŸ†”</tg-emoji> <b>Order:</b> <code>{order_id}</code>
-<tg-emoji emoji-id="6215156189454409086">ðŸ’°</tg-emoji> <b>Amount:</b> â‚¹{order[2]:.2f}
-â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
-ðŸ“± Please wait 10-15 seconds...
+<tg-emoji emoji-id="6070873970100409600">⭐</tg-emoji> <b>PAYMENT VERIFICATION</b>
+━━━━━━━━━━━━━━━━━━
+<tg-emoji emoji-id="5334890573281114250">🆔</tg-emoji> <b>Order:</b> <code>{order_id}</code>
+<tg-emoji emoji-id="6215156189454409086">💰</tg-emoji> <b>Amount:</b> ₹{order[2]:.2f}
+━━━━━━━━━━━━━━━━━━
+📱 Please wait 10-15 seconds...
 Payment will be auto-detected!
 """
         try:
@@ -2882,7 +2881,7 @@ Payment will be auto-detected!
             [CB(feedback_n, style=db.get_setting("trial_btn_feedback_color") or "danger", icon=feedback_e, url=feedback_url)],
             [CB("Back to Menu", style="danger", icon=get_button_emoji("back"), callback_data="back_to_menu")]
         ]
-        caption = db.get_setting("trial_menu_caption") or "ðŸŽ <b>FREE TRIAL MENU</b>\n\nChoose an option below:"
+        caption = db.get_setting("trial_menu_caption") or "🎁 <b>FREE TRIAL MENU</b>\n\nChoose an option below:"
         
         menu_msg_chat_id = db.get_setting("trial_menu_msg_chat_id")
         menu_msg_id = db.get_setting("trial_menu_msg_id")
@@ -2915,7 +2914,7 @@ Payment will be auto-detected!
                 
         if not sent:
             trial_key = db.get_setting("trial_key") or "TRIAL-KEY-HERE"
-            await query.message.reply_text(f"ðŸ”‘ <b>Your Free Trial Key is:</b>\n\n<code>{trial_key}</code>", parse_mode="HTML")
+            await query.message.reply_text(f"🔑 <b>Your Free Trial Key is:</b>\n\n<code>{trial_key}</code>", parse_mode="HTML")
 
     elif data == "trial_get_apk":
         trial_chat_id = db.get_setting("trial_msg_chat_id")
@@ -2934,15 +2933,15 @@ Payment will be auto-detected!
         
         kb = []
         if trial_apk:
-            kb.append([InlineKeyboardButton("ðŸ“¥ Download Link", url=trial_apk)])
+            kb.append([InlineKeyboardButton("📥 Download Link", url=trial_apk)])
         kb.append([CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="menu_trial")])
         
         if sent:
-            msg = "ðŸ“¥ <b>APK File sent below!</b>\n(Check the message below)"
+            msg = "📥 <b>APK File sent below!</b>\n(Check the message below)"
         else:
-            msg = "ðŸ“¥ <b>Click the button below to download the APK:</b>"
+            msg = "📥 <b>Click the button below to download the APK:</b>"
             if not trial_apk:
-                msg = "âŒ APK is not set yet."
+                msg = "❌ APK is not set yet."
                 
         await safe_edit(query, msg, InlineKeyboardMarkup(kb), parse_mode="HTML")
 
@@ -2959,15 +2958,15 @@ Payment will be auto-detected!
                 pass
                 
         kb = [[CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="menu_trial")]]
-        await safe_edit(query, f"ðŸ“ <b>SETUP GUIDE:</b>\n\n{trial_setup}", InlineKeyboardMarkup(kb), parse_mode="HTML")
+        await safe_edit(query, f"📝 <b>SETUP GUIDE:</b>\n\n{trial_setup}", InlineKeyboardMarkup(kb), parse_mode="HTML")
 
     elif data.startswith("admin_"):
         if str(user_id) != str(ADMIN_ID):
-            await safe_answer(query, "âŒ You are not authorized!", show_alert=True)
+            await safe_answer(query, "❌ You are not authorized!", show_alert=True)
             return
 
         if data == "admin_panel":
-            text = "ðŸ›  <b>ADMIN PANEL</b>\n\nChoose an action below:"
+            text = "🛠 <b>ADMIN PANEL</b>\n\nChoose an action below:"
             await safe_edit(query, text=text, reply_markup=get_admin_panel_keyboard(), parse_mode="HTML")
 
         elif data == "admin_export_users":
@@ -2975,7 +2974,7 @@ Payment will be auto-detected!
                 return
             all_users = list(db.db.users.find({}, {"_id": 0})) 
             if not all_users:
-                await query.message.reply_text("âŒ No users found.")
+                await query.message.reply_text("❌ No users found.")
                 return
             json_data = json.dumps(all_users, indent=4)
             file_io = io.BytesIO(json_data.encode("utf-8"))
@@ -2983,7 +2982,7 @@ Payment will be auto-detected!
             await context.bot.send_document(
                 chat_id=query.message.chat_id,
                 document=file_io,
-                caption="âœ… <b>Exported user data.</b>\n\nâš ï¸ <b>Clear ALL users?</b>",
+                caption="✅ <b>Exported user data.</b>\n\n⚠️ <b>Clear ALL users?</b>",
                 parse_mode="HTML",
                 reply_markup=InlineKeyboardMarkup([
                     [CB("Yes, Clear Database", style="danger", icon=get_button_emoji("clear"), callback_data="admin_clear_users_confirm")],
@@ -2996,7 +2995,7 @@ Payment will be auto-detected!
             if str(user_id) != str(ADMIN_ID):
                 return
             deleted = db.db.users.delete_many({}).deleted_count
-            await query.message.reply_text(f"âœ… <b>Deleted {deleted} users.</b>", parse_mode="HTML")
+            await query.message.reply_text(f"✅ <b>Deleted {deleted} users.</b>", parse_mode="HTML")
             await send_screen(query, "Database cleared.", get_admin_panel_keyboard(), "admin_panel")
             return
 
@@ -3005,7 +3004,7 @@ Payment will be auto-detected!
                 "Product Store", "My Profile", "Add Balance", "Order History", 
                 "Deposit History", "Tutorial", "Support", "Download Hack", 
                 "Referral", "Verify Payment", "Check Again", "Back to Menu", 
-                "Back", "Main Menu", "Cancel", "âŒ Cancel", "BACK", "Confirm", "Clear", "Transfer Balance"
+                "Back", "Main Menu", "Cancel", "❌ Cancel", "BACK", "Confirm", "Clear", "Transfer Balance"
             ]
             rows = []
             for i in range(0, len(buttons), 2):
@@ -3016,18 +3015,18 @@ Payment will be auto-detected!
                 rows.append(row)
             rows.append([CB("Clear Colors", style="danger", icon=get_button_emoji("clear"), callback_data="admin_clear_colors")])
             rows.append([CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_panel")])
-            await safe_edit(query, "ðŸŽ¨ <b>Select a button to change its color:</b>\n(Clicking it cycles through colors)", InlineKeyboardMarkup(rows), parse_mode="HTML")
+            await safe_edit(query, "🎨 <b>Select a button to change its color:</b>\n(Clicking it cycles through colors)", InlineKeyboardMarkup(rows), parse_mode="HTML")
 
         elif data == "admin_clear_colors":
             buttons = [
                 "Product Store", "My Profile", "Add Balance", "Order History", 
                 "Deposit History", "Tutorial", "Support", "Download Hack", 
                 "Referral", "Verify Payment", "Check Again", "Back to Menu", 
-                "Back", "Main Menu", "Cancel", "âŒ Cancel", "BACK", "Confirm", "Clear", "Transfer Balance"
+                "Back", "Main Menu", "Cancel", "❌ Cancel", "BACK", "Confirm", "Clear", "Transfer Balance"
             ]
             for btn in buttons:
                 db.delete_setting(f"color_{btn}")
-            await safe_answer(query, "âœ… Colors reset!", show_alert=True)
+            await safe_answer(query, "✅ Colors reset!", show_alert=True)
             # Re-render
             rows = []
             for i in range(0, len(buttons), 2):
@@ -3038,7 +3037,7 @@ Payment will be auto-detected!
                 rows.append(row)
             rows.append([CB("Clear Colors", style="danger", icon=get_button_emoji("clear"), callback_data="admin_clear_colors")])
             rows.append([CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_panel")])
-            await safe_edit(query, "ðŸŽ¨ <b>Select a button to change its color:</b>\n(Clicking it cycles through colors)", InlineKeyboardMarkup(rows), parse_mode="HTML")
+            await safe_edit(query, "🎨 <b>Select a button to change its color:</b>\n(Clicking it cycles through colors)", InlineKeyboardMarkup(rows), parse_mode="HTML")
 
         elif data.startswith("admin_color_"):
             btn_name = data.split("admin_color_")[1]
@@ -3056,7 +3055,7 @@ Payment will be auto-detected!
                 "Product Store", "My Profile", "Add Balance", "Order History", 
                 "Deposit History", "Tutorial", "Support", "Download Hack", 
                 "Referral", "Verify Payment", "Check Again", "Back to Menu", 
-                "Back", "Main Menu", "Cancel", "âŒ Cancel", "BACK", "Confirm", "Clear"
+                "Back", "Main Menu", "Cancel", "❌ Cancel", "BACK", "Confirm", "Clear"
             ]
             rows = []
             for i in range(0, len(buttons), 2):
@@ -3067,7 +3066,7 @@ Payment will be auto-detected!
                 rows.append(row)
             rows.append([CB("Clear Colors", style="danger", icon=get_button_emoji("clear"), callback_data="admin_clear_colors")])
             rows.append([CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_panel")])
-            await safe_edit(query, "ðŸŽ¨ <b>Select a button to change its color:</b>\n(Clicking it cycles through colors)", InlineKeyboardMarkup(rows), parse_mode="HTML")
+            await safe_edit(query, "🎨 <b>Select a button to change its color:</b>\n(Clicking it cycles through colors)", InlineKeyboardMarkup(rows), parse_mode="HTML")
 
         elif data == "admin_devices":
             products = db.get_products()
@@ -3077,12 +3076,12 @@ Payment will be auto-detected!
             
             rows = []
             for cat in categories:
-                status = "ðŸ”´ Hidden" if cat in hidden_list else "ðŸŸ¢ Visible"
+                status = "🔴 Hidden" if cat in hidden_list else "🟢 Visible"
                 cb = encode_cb("admin_toggledv", cat)
                 rows.append([CB(f"{cat} - {status}", style="danger", icon=get_button_emoji("star"), callback_data=cb)])
             
             rows.append([CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_panel")])
-            await safe_edit(query, "ðŸ“± <b>Manage Devices Visibility</b>\nClick on a device category to toggle its visibility in the Product Store:", InlineKeyboardMarkup(rows), parse_mode="HTML")
+            await safe_edit(query, "📱 <b>Manage Devices Visibility</b>\nClick on a device category to toggle its visibility in the Product Store:", InlineKeyboardMarkup(rows), parse_mode="HTML")
 
         elif data.startswith("admin_toggledv" + SEP):
             cat = decode_cb(data)[1]
@@ -3101,12 +3100,12 @@ Payment will be auto-detected!
             categories = list(products.keys())
             rows = []
             for c in categories:
-                status = "ðŸ”´ Hidden" if c in hidden_list else "ðŸŸ¢ Visible"
+                status = "🔴 Hidden" if c in hidden_list else "🟢 Visible"
                 cb = encode_cb("admin_toggledv", c)
                 rows.append([CB(f"{c} - {status}", style="danger", icon=get_button_emoji("star"), callback_data=cb)])
             
             rows.append([CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_panel")])
-            await safe_edit(query, "ðŸ“± <b>Manage Devices Visibility</b>\nClick on a device category to toggle its visibility in the Product Store:", InlineKeyboardMarkup(rows), parse_mode="HTML")
+            await safe_edit(query, "📱 <b>Manage Devices Visibility</b>\nClick on a device category to toggle its visibility in the Product Store:", InlineKeyboardMarkup(rows), parse_mode="HTML")
 
         elif data == "admin_texts":
             context.user_data["awaiting_text_key"] = None
@@ -3116,7 +3115,7 @@ Payment will be auto-detected!
             for cat in db.get_products().keys():
                 rows.append([CB(f"Edit Category: {cat}", style="primary", icon=get_button_emoji("tutorial"), callback_data=f"admin_edittext_cat_{cat}")])
             rows.append([CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_panel")])
-            await safe_edit(query, "ðŸ“ <b>Select a screen text to edit:</b>", InlineKeyboardMarkup(rows), parse_mode="HTML")
+            await safe_edit(query, "📝 <b>Select a screen text to edit:</b>", InlineKeyboardMarkup(rows), parse_mode="HTML")
 
         elif data.startswith("admin_edittext_"):
             key = data.split("admin_edittext_")[1]
@@ -3133,7 +3132,7 @@ Payment will be auto-detected!
             ]
             await safe_edit(
                 query, 
-                f"ðŸ“ <b>Send the new text for {name}</b>\n\n(You can use HTML tags like &lt;b&gt;, &lt;i&gt; and emojis).\nType /cancel to abort.", 
+                f"📝 <b>Send the new text for {name}</b>\n\n(You can use HTML tags like &lt;b&gt;, &lt;i&gt; and emojis).\nType /cancel to abort.", 
                 InlineKeyboardMarkup(keyboard), 
                 parse_mode="HTML"
             )
@@ -3142,7 +3141,7 @@ Payment will be auto-detected!
             key = data.split("admin_cleartxt_")[1]
             db.delete_setting(f"text_{key}")
             context.user_data["awaiting_text_key"] = None
-            await safe_answer(query, "âœ… Caption Removed / Reset to default!", show_alert=True)
+            await safe_answer(query, "✅ Caption Removed / Reset to default!", show_alert=True)
             # Re-render admin_texts
             rows = []
             for k, v in EDITABLE_TEXTS.items():
@@ -3150,7 +3149,7 @@ Payment will be auto-detected!
             for cat in db.get_products().keys():
                 rows.append([CB(f"Edit Category: {cat}", style="primary", icon=get_button_emoji("tutorial"), callback_data=f"admin_edittext_cat_{cat}")])
             rows.append([CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_panel")])
-            await safe_edit(query, "ðŸ“ <b>Select a screen text to edit:</b>", InlineKeyboardMarkup(rows), parse_mode="HTML")
+            await safe_edit(query, "📝 <b>Select a screen text to edit:</b>", InlineKeyboardMarkup(rows), parse_mode="HTML")
 
         elif data == "admin_emojis":
             context.user_data["awaiting_emoji_key"] = None
@@ -3172,7 +3171,7 @@ Payment will be auto-detected!
                     row.append(CB(btn_text, style="primary", icon=emoji, callback_data=f"admin_editemoji_{k}"))
                 rows.append(row)
             rows.append([CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_panel")])
-            await safe_edit(query, "âœ¨ <b>Select an Emoji to edit:</b>", InlineKeyboardMarkup(rows), parse_mode="HTML")
+            await safe_edit(query, "✨ <b>Select an Emoji to edit:</b>", InlineKeyboardMarkup(rows), parse_mode="HTML")
 
         elif data.startswith("admin_editemoji_"):
             key = data.split("admin_editemoji_")[1]
@@ -3184,7 +3183,7 @@ Payment will be auto-detected!
             ]
             await safe_edit(
                 query, 
-                f"âœ¨ <b>Send the new Premium Emoji for '{display_name}'</b>\n\n(You can just send any premium emoji directly here, I will extract the ID!)\nType /cancel to abort.", 
+                f"✨ <b>Send the new Premium Emoji for '{display_name}'</b>\n\n(You can just send any premium emoji directly here, I will extract the ID!)\nType /cancel to abort.", 
                 InlineKeyboardMarkup(keyboard), 
                 parse_mode="HTML"
             )
@@ -3193,7 +3192,7 @@ Payment will be auto-detected!
             key = data.split("admin_clearemoji_")[1]
             db.delete_setting(f"emoji_{key}")
             context.user_data["awaiting_emoji_key"] = None
-            await safe_answer(query, "âœ… Emoji Removed / Reset to default!", show_alert=True)
+            await safe_answer(query, "✅ Emoji Removed / Reset to default!", show_alert=True)
             # Re-render admin_emojis
             rows = []
             keys = list(BUTTON_EMOJIS.keys())
@@ -3209,18 +3208,18 @@ Payment will be auto-detected!
                     row.append(CB(btn_text, style="primary", icon=emoji, callback_data=f"admin_editemoji_{k}"))
                 rows.append(row)
             rows.append([CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_panel")])
-            await safe_edit(query, "âœ¨ <b>Select an Emoji to edit:</b>", InlineKeyboardMarkup(rows), parse_mode="HTML")
+            await safe_edit(query, "✨ <b>Select an Emoji to edit:</b>", InlineKeyboardMarkup(rows), parse_mode="HTML")
 
         elif data == "admin_trial_menu":
             trial_mode = db.get_setting("trial_mode") or "0"
-            status_text = "ðŸŸ¢ ON" if trial_mode == "1" else "ðŸ”´ OFF"
-            text = f"ðŸŽ <b>MANAGE FREE TRIAL</b>\n\nConfigure the Free Trial button settings below."
+            status_text = "🟢 ON" if trial_mode == "1" else "🔴 OFF"
+            text = f"🎁 <b>MANAGE FREE TRIAL</b>\n\nConfigure the Free Trial button settings below."
             keyboard = [
                 [CB(f"Status: {status_text}", style="primary", icon="", callback_data="admin_trial_toggle")],
                 [CB("Main Button Name", style="danger", icon=get_button_emoji("tutorial"), callback_data="admin_trial_set_btnname"),
                  CB("Main Button Emoji", style="danger", icon=get_button_emoji("star"), callback_data="admin_trial_set_btnemoji")],
                 [CB(f"Main Button Color: {(db.get_setting('trial_btncolor') or 'danger').title()}", style="success", icon="", callback_data="admin_trial_cycle_maincolor")],
-                [CB("Customize Inner Buttons âž¡ï¸", style="primary", icon="", callback_data="admin_trial_inner_btns")],
+                [CB("Customize Inner Buttons ➡️", style="primary", icon="", callback_data="admin_trial_inner_btns")],
                 [CB("Menu Caption", style="danger", icon=get_button_emoji("tutorial"), callback_data="admin_trial_set_menu_caption")],
                 [CB("APK Link", style="danger", icon=get_button_emoji("star"), callback_data="admin_trial_set_apk"),
                  CB("Setup Link", style="danger", icon=get_button_emoji("tutorial"), callback_data="admin_trial_set_setuplink")],
@@ -3236,14 +3235,14 @@ Payment will be auto-detected!
             db.set_setting("trial_mode", new_status)
             await safe_answer(query, "Trial Status Updated!", show_alert=True)
             # Re-render menu
-            status_text = "ðŸŸ¢ ON" if new_status == "1" else "ðŸ”´ OFF"
-            text = f"ðŸŽ <b>MANAGE FREE TRIAL</b>\n\nConfigure the Free Trial button settings below."
+            status_text = "🟢 ON" if new_status == "1" else "🔴 OFF"
+            text = f"🎁 <b>MANAGE FREE TRIAL</b>\n\nConfigure the Free Trial button settings below."
             keyboard = [
                 [CB(f"Status: {status_text}", style="primary", icon="", callback_data="admin_trial_toggle")],
                 [CB("Main Button Name", style="danger", icon=get_button_emoji("tutorial"), callback_data="admin_trial_set_btnname"),
                  CB("Main Button Emoji", style="danger", icon=get_button_emoji("star"), callback_data="admin_trial_set_btnemoji")],
                 [CB(f"Main Button Color: {(db.get_setting('trial_btncolor') or 'danger').title()}", style="success", icon="", callback_data="admin_trial_cycle_maincolor")],
-                [CB("Customize Inner Buttons âž¡ï¸", style="primary", icon="", callback_data="admin_trial_inner_btns")],
+                [CB("Customize Inner Buttons ➡️", style="primary", icon="", callback_data="admin_trial_inner_btns")],
                 [CB("Menu Caption", style="danger", icon=get_button_emoji("tutorial"), callback_data="admin_trial_set_menu_caption")],
                 [CB("APK Link", style="danger", icon=get_button_emoji("star"), callback_data="admin_trial_set_apk"),
                  CB("Setup Link", style="danger", icon=get_button_emoji("tutorial"), callback_data="admin_trial_set_setuplink")],
@@ -3255,34 +3254,34 @@ Payment will be auto-detected!
 
         elif data == "admin_trial_set_msg":
             context.user_data["awaiting_trial_step"] = "msg"
-            await query.message.reply_text("ðŸ“¥ Forward any message here (File, APK, Photo with Caption, or Text) that you want to be sent as the Free Trial Setup/File. Type /cancel to abort.")
+            await query.message.reply_text("📥 Forward any message here (File, APK, Photo with Caption, or Text) that you want to be sent as the Free Trial Setup/File. Type /cancel to abort.")
 
         elif data == "admin_trial_set_voice":
             context.user_data["awaiting_trial_step"] = "voice"
-            await query.message.reply_text("ðŸŽ¤ Forward a Voice Note here for the Free Trial. Type /cancel to abort.")
+            await query.message.reply_text("🎤 Forward a Voice Note here for the Free Trial. Type /cancel to abort.")
 
         elif data == "admin_trial_set_apk":
             context.user_data["awaiting_trial_step"] = "apk"
-            await query.message.reply_text("ðŸ“¥ Enter the APK Link URL (like https://t.me/channel/123). Type /cancel to abort.")
+            await query.message.reply_text("📥 Enter the APK Link URL (like https://t.me/channel/123). Type /cancel to abort.")
 
         elif data == "admin_trial_set_setup":
             context.user_data["awaiting_trial_step"] = "setup"
-            await query.message.reply_text("ðŸ“ Send the Setup Guide / Instructions for the trial. Type /cancel to abort.")
+            await query.message.reply_text("📝 Send the Setup Guide / Instructions for the trial. Type /cancel to abort.")
 
         elif data == "admin_trial_set_key":
             context.user_data["awaiting_trial_step"] = "key"
-            await query.message.reply_text("ðŸ”‘ Send the Universal Trial Key that users will get. Type /cancel to abort.")
+            await query.message.reply_text("🔑 Send the Universal Trial Key that users will get. Type /cancel to abort.")
 
         elif data == "admin_trial_set_btnname":
             context.user_data["awaiting_trial_step"] = "btnname"
-            await query.message.reply_text("ðŸ“ Send the Button Caption for the Free Trial button (e.g. GET FREE TRIAL APK). Type /cancel to abort.")
+            await query.message.reply_text("📝 Send the Button Caption for the Free Trial button (e.g. GET FREE TRIAL APK). Type /cancel to abort.")
 
         elif data == "admin_trial_set_btnemoji":
             context.user_data["awaiting_trial_step"] = "btnemoji"
-            await query.message.reply_text("âœ¨ Send the Premium Emoji for the Free Trial button. Type /cancel to abort.")
+            await query.message.reply_text("✨ Send the Premium Emoji for the Free Trial button. Type /cancel to abort.")
 
         elif data == "admin_trial_inner_btns":
-            text = f"âš™ï¸ <b>CUSTOMIZE INNER BUTTONS</b>\n\nSet the names, emojis and colors for the buttons inside the Free Trial Menu."
+            text = f"⚙️ <b>CUSTOMIZE INNER BUTTONS</b>\n\nSet the names, emojis and colors for the buttons inside the Free Trial Menu."
             c_key = db.get_setting("trial_btn_key_color") or "primary"
             c_apk = db.get_setting("trial_btn_apk_color") or "success"
             c_setup = db.get_setting("trial_btn_setup_color") or "primary"
@@ -3311,7 +3310,7 @@ Payment will be auto-detected!
         elif data.startswith("admin_trial_set_"):
             step = data.split("admin_trial_set_")[1]
             context.user_data["awaiting_trial_step"] = step
-            await query.message.reply_text(f"ðŸ“ Send the new value for {step.replace('_', ' ').title()}.\nFor emojis, you can send a standard unicode emoji (like ðŸŽ) or a Premium Custom Emoji.\nType /cancel to abort.")
+            await query.message.reply_text(f"📝 Send the new value for {step.replace('_', ' ').title()}.\nFor emojis, you can send a standard unicode emoji (like 🎁) or a Premium Custom Emoji.\nType /cancel to abort.")
         elif data == "admin_trial_cycle_maincolor":
             styles = ["primary", "success", "danger"]
             current = db.get_setting("trial_btncolor") or "danger"
@@ -3322,14 +3321,14 @@ Payment will be auto-detected!
             db.set_setting("trial_btncolor", next_style)
             # Re-render directly
             trial_mode = db.get_setting("trial_mode") or "0"
-            status_text = "ðŸŸ¢ ON" if trial_mode == "1" else "ðŸ”´ OFF"
-            text = f"ðŸŽ <b>MANAGE FREE TRIAL</b>\n\nConfigure the Free Trial button settings below."
+            status_text = "🟢 ON" if trial_mode == "1" else "🔴 OFF"
+            text = f"🎁 <b>MANAGE FREE TRIAL</b>\n\nConfigure the Free Trial button settings below."
             keyboard = [
                 [CB(f"Status: {status_text}", style="primary", icon="", callback_data="admin_trial_toggle")],
                 [CB("Main Button Name", style="danger", icon=get_button_emoji("tutorial"), callback_data="admin_trial_set_btnname"),
                  CB("Main Button Emoji", style="danger", icon=get_button_emoji("star"), callback_data="admin_trial_set_btnemoji")],
                 [CB(f"Main Button Color: {(db.get_setting('trial_btncolor') or 'danger').title()}", style="success", icon="", callback_data="admin_trial_cycle_maincolor")],
-                [CB("Customize Inner Buttons âž¡ï¸", style="primary", icon="", callback_data="admin_trial_inner_btns")],
+                [CB("Customize Inner Buttons ➡️", style="primary", icon="", callback_data="admin_trial_inner_btns")],
                 [CB("Menu Caption", style="danger", icon=get_button_emoji("tutorial"), callback_data="admin_trial_set_menu_caption")],
                 [CB("APK Link", style="danger", icon=get_button_emoji("star"), callback_data="admin_trial_set_apk"),
                  CB("Setup Link", style="danger", icon=get_button_emoji("tutorial"), callback_data="admin_trial_set_setuplink")],
@@ -3349,7 +3348,7 @@ Payment will be auto-detected!
                 next_style = "primary"
             db.set_setting(f"trial_btn_{btn}_color", next_style)
             # Re-render directly
-            text = f"âš™ï¸ <b>CUSTOMIZE INNER BUTTONS</b>\n\nSet the names, emojis and colors for the buttons inside the Free Trial Menu."
+            text = f"⚙️ <b>CUSTOMIZE INNER BUTTONS</b>\n\nSet the names, emojis and colors for the buttons inside the Free Trial Menu."
             c_key = db.get_setting("trial_btn_key_color") or "primary"
             c_apk = db.get_setting("trial_btn_apk_color") or "success"
             c_setup = db.get_setting("trial_btn_setup_color") or "primary"
@@ -3377,7 +3376,7 @@ Payment will be auto-detected!
 
         elif data == "admin_maintenance_menu":
             current = db.get_setting("maintenance_mode")
-            status_text = "ðŸŸ¢ ON" if current == "1" else "ðŸ”´ OFF"
+            status_text = "🟢 ON" if current == "1" else "🔴 OFF"
             toggle_text = "Turn OFF" if current == "1" else "Turn ON"
             
             keyboard = [
@@ -3386,14 +3385,14 @@ Payment will be auto-detected!
                 [CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_panel")]
             ]
             
-            text = "ðŸ›  <b>MAINTENANCE MODE</b>\n\nWhen Maintenance Mode is ON, normal users will see the Maintenance Message instead of the bot menus. Admins can still use the bot normally."
+            text = "🛠 <b>MAINTENANCE MODE</b>\n\nWhen Maintenance Mode is ON, normal users will see the Maintenance Message instead of the bot menus. Admins can still use the bot normally."
             await safe_edit(query, text, InlineKeyboardMarkup(keyboard), parse_mode="HTML")
 
         elif data == "admin_maintenance":
             current = db.get_setting("maintenance_mode")
             new_status = "0" if current == "1" else "1"
             db.set_setting("maintenance_mode", new_status)
-            status_text = "ðŸŸ¢ ON" if new_status == "1" else "ðŸ”´ OFF"
+            status_text = "🟢 ON" if new_status == "1" else "🔴 OFF"
             toggle_text = "Turn OFF" if new_status == "1" else "Turn ON"
             
             keyboard = [
@@ -3401,15 +3400,15 @@ Payment will be auto-detected!
                 [CB("Change Maintenance Message", style="primary", icon=get_button_emoji("tutorial"), callback_data="admin_edittext_maintenance_msg")],
                 [CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_panel")]
             ]
-            await safe_answer(query, f"âœ… Maintenance Mode is now {'ON' if new_status == '1' else 'OFF'}!", show_alert=True)
-            text = "ðŸ›  <b>MAINTENANCE MODE</b>\n\nWhen Maintenance Mode is ON, normal users will see the Maintenance Message instead of the bot menus. Admins can still use the bot normally."
+            await safe_answer(query, f"✅ Maintenance Mode is now {'ON' if new_status == '1' else 'OFF'}!", show_alert=True)
+            text = "🛠 <b>MAINTENANCE MODE</b>\n\nWhen Maintenance Mode is ON, normal users will see the Maintenance Message instead of the bot menus. Admins can still use the bot normally."
             await safe_edit(query, text, InlineKeyboardMarkup(keyboard), parse_mode="HTML")
 
         elif data == "admin_broadcast":
             context.user_data["awaiting_broadcast"] = True
             text = (
-                "ðŸ“¢ <b>Broadcast Mode ON</b>\n\n"
-                "Ab jo bhi message bhejoge (text, photo, video, voice, audio, document, sticker â€” kuch bhi) "
+                "📢 <b>Broadcast Mode ON</b>\n\n"
+                "Ab jo bhi message bhejoge (text, photo, video, voice, audio, document, sticker — kuch bhi) "
                 "wo sabhi users ko bhej diya jaayega.\n\n"
                 "Cancel karne ke liye /cancel bhejo."
             )
@@ -3419,7 +3418,7 @@ Payment will be auto-detected!
         elif data == "admin_addproduct":
             context.user_data["awaiting_addproduct"] = True
             text = (
-                "âž• <b>ADD PRODUCT</b>\n\n"
+                "➕ <b>ADD PRODUCT</b>\n\n"
                 "Reply is format mein ek hi message mein:\n"
                 "<code>CATEGORY | NAME | PRODUCT_ID | PLAN | PRICE | ANDROID_ID</code>\n\n"
                 "Example:\n"
@@ -3433,10 +3432,10 @@ Payment will be auto-detected!
         elif data == "admin_addkeys_list":
             products = list(db.db.products.find({"is_manual": True}))
             if not products:
-                await safe_answer(query, "âŒ Koi offline product nahi hai!", show_alert=True)
+                await safe_answer(query, "❌ Koi offline product nahi hai!", show_alert=True)
                 return
             
-            text = "ðŸ”‘ <b>ADD MANUAL KEYS</b>\n\nSelect the product/plan to add keys to:"
+            text = "🔑 <b>ADD MANUAL KEYS</b>\n\nSelect the product/plan to add keys to:"
             keyboard = []
             for p in products:
                 label = f"{p['name']} - {p.get('plan_name', '')}"
@@ -3449,7 +3448,7 @@ Payment will be auto-detected!
             plan_id = parts[1]
             plan_info = db.get_plan_by_id(plan_id)
             if not plan_info:
-                await safe_answer(query, "âŒ Plan not found!", show_alert=True)
+                await safe_answer(query, "❌ Plan not found!", show_alert=True)
                 return
                 
             pid = str(plan_info["product_id"])
@@ -3459,11 +3458,11 @@ Payment will be auto-detected!
             used_count = db.db.manual_keys.count_documents({"product_id": pid, "plan": p_plan, "used": True})
             
             text = (
-                f"ðŸ”‘ <b>MANUAL KEYS DASHBOARD</b>\n\n"
+                f"🔑 <b>MANUAL KEYS DASHBOARD</b>\n\n"
                 f"<b>Product:</b> {plan_info['name']}\n"
                 f"<b>Plan:</b> {plan_info['plan']}\n\n"
-                f"âœ… <b>Active Keys:</b> {unused_count}\n"
-                f"ðŸ”´ <b>Used Keys:</b> {used_count}"
+                f"✅ <b>Active Keys:</b> {unused_count}\n"
+                f"🔴 <b>Used Keys:</b> {used_count}"
             )
             keyboard = [
                 [CB("Add New Keys", style="success", icon=get_button_emoji("add"), callback_data=encode_cb("admin_manual_addkeys", plan_id))],
@@ -3489,13 +3488,13 @@ Payment will be auto-detected!
             keys_cursor = db.db.manual_keys.find({"product_id": pid, "plan": p_plan, "used": False}).limit(30)
             keys_list = list(keys_cursor)
             
-            text = f"ðŸ”‘ <b>ACTIVE KEYS (Max 30 shown)</b>\n\nProduct: {plan_info['name']}\nPlan: {plan_info['plan']}\n\nTap any key below to DELETE it:"
+            text = f"🔑 <b>ACTIVE KEYS (Max 30 shown)</b>\n\nProduct: {plan_info['name']}\nPlan: {plan_info['plan']}\n\nTap any key below to DELETE it:"
             keyboard = []
             
             for k in keys_list:
                 key_str = str(k["key"])
                 short_key = key_str if len(key_str) <= 15 else key_str[:15] + "..."
-                keyboard.append([CB(f"âŒ {short_key}", style="danger", icon="", callback_data=encode_cb("admin_manual_delkey", str(k["_id"]), plan_id))])
+                keyboard.append([CB(f"❌ {short_key}", style="danger", icon="", callback_data=encode_cb("admin_manual_delkey", str(k["_id"]), plan_id))])
                 
             keyboard.append([CB("Back to Dashboard", style="primary", icon=get_button_emoji("back"), callback_data=encode_cb("admin_manual_dash", plan_id))])
             
@@ -3515,9 +3514,9 @@ Payment will be auto-detected!
             keys_list = list(keys_cursor)
             
             if not keys_list:
-                text = f"ðŸ”‘ <b>USED KEYS</b>\n\nProduct: {plan_info['name']}\nPlan: {plan_info['plan']}\n\nKoi bhi key ab tak use nahi hui hai."
+                text = f"🔑 <b>USED KEYS</b>\n\nProduct: {plan_info['name']}\nPlan: {plan_info['plan']}\n\nKoi bhi key ab tak use nahi hui hai."
             else:
-                text = f"ðŸ”‘ <b>USED KEYS (Max 30 shown)</b>\n\nProduct: {plan_info['name']}\nPlan: {plan_info['plan']}\n\n"
+                text = f"🔑 <b>USED KEYS (Max 30 shown)</b>\n\nProduct: {plan_info['name']}\nPlan: {plan_info['plan']}\n\n"
                 for i, k in enumerate(keys_list, 1):
                     text += f"{i}. <code>{k['key']}</code>\n"
             
@@ -3535,16 +3534,16 @@ Payment will be auto-detected!
                 if key_data:
                     key_str = str(key_data["key"])
                     short_key = key_str if len(key_str) <= 15 else key_str[:15] + "..."
-                    text = f"âš ï¸ <b>CONFIRM DELETION</b>\n\nAre you sure you want to delete this key?\n<code>{short_key}</code>"
+                    text = f"⚠️ <b>CONFIRM DELETION</b>\n\nAre you sure you want to delete this key?\n<code>{short_key}</code>"
                     keyboard = [
                         [CB("Yes, Delete", style="danger", icon="", callback_data=encode_cb("admin_manual_deldo", key_oid, plan_id))],
                         [CB("No, Cancel", style="success", icon="", callback_data=encode_cb("admin_manual_listkeys", plan_id))]
                     ]
                     await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
                 else:
-                    await safe_answer(query, "âŒ Key not found!", show_alert=True)
+                    await safe_answer(query, "❌ Key not found!", show_alert=True)
             except Exception as e:
-                await safe_answer(query, "âŒ Error reading key", show_alert=True)
+                await safe_answer(query, "❌ Error reading key", show_alert=True)
 
         elif data.startswith("admin_manual_deldo" + SEP):
             parts = decode_cb(data)
@@ -3554,9 +3553,9 @@ Payment will be auto-detected!
             from bson.objectid import ObjectId
             try:
                 db.db.manual_keys.delete_one({"_id": ObjectId(key_oid)})
-                await safe_answer(query, "âœ… Key Deleted!", show_alert=True)
+                await safe_answer(query, "✅ Key Deleted!", show_alert=True)
             except Exception as e:
-                await safe_answer(query, "âŒ Error deleting key", show_alert=True)
+                await safe_answer(query, "❌ Error deleting key", show_alert=True)
                 
             # Reload listkeys
             plan_info = db.get_plan_by_id(plan_id)
@@ -3565,12 +3564,12 @@ Payment will be auto-detected!
                 p_plan = str(plan_info["plan"])
                 keys_cursor = db.db.manual_keys.find({"product_id": pid, "plan": p_plan, "used": False}).limit(30)
                 keys_list = list(keys_cursor)
-                text = f"ðŸ”‘ <b>ACTIVE KEYS (Max 30 shown)</b>\n\nProduct: {plan_info['name']}\nPlan: {plan_info['plan']}\n\nTap any key below to DELETE it:"
+                text = f"🔑 <b>ACTIVE KEYS (Max 30 shown)</b>\n\nProduct: {plan_info['name']}\nPlan: {plan_info['plan']}\n\nTap any key below to DELETE it:"
                 keyboard = []
                 for k in keys_list:
                     key_str = str(k["key"])
                     short_key = key_str if len(key_str) <= 15 else key_str[:15] + "..."
-                    keyboard.append([CB(f"âŒ {short_key}", style="danger", icon="", callback_data=encode_cb("admin_manual_delkey", str(k["_id"]), plan_id))])
+                    keyboard.append([CB(f"❌ {short_key}", style="danger", icon="", callback_data=encode_cb("admin_manual_delkey", str(k["_id"]), plan_id))])
                 keyboard.append([CB("Back to Dashboard", style="primary", icon=get_button_emoji("back"), callback_data=encode_cb("admin_manual_dash", plan_id))])
                 await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
             else:
@@ -3584,7 +3583,7 @@ Payment will be auto-detected!
                 return
             context.user_data["awaiting_manual_addkeys"] = plan_id
             text = (
-                f"ðŸ”‘ <b>ADD NEW KEYS</b>\n\n"
+                f"🔑 <b>ADD NEW KEYS</b>\n\n"
                 f"Product: {plan_info['name']}\n"
                 f"Plan: {plan_info['plan']}\n\n"
                 f"Ek se zyada keys aap ek sath bhej sakte hain (bas har key ko nayi line me likhein).\n\n"
@@ -3608,7 +3607,7 @@ Payment will be auto-detected!
                 "name": name
             }
             text = (
-                f"âž• <b>Adding another plan for {name}</b>\n\n"
+                f"➕ <b>Adding another plan for {name}</b>\n\n"
                 f"Enter the NEW Plan/Duration Name (e.g. 7 Days, 1 Month):\n\n"
                 f"Type /cancel to abort."
             )
@@ -3618,7 +3617,7 @@ Payment will be auto-detected!
             context.user_data["awaiting_manual_step"] = 1
             context.user_data["manual_prod_data"] = {}
             text = (
-                "ðŸ›  <b>ADD MANUAL PRODUCT (Offline)</b>\n\n"
+                "🛠 <b>ADD MANUAL PRODUCT (Offline)</b>\n\n"
                 "STEP 1/5: Sabse pehle Category ka naam bhejiye jisme ye product dikhega.\n\n"
                 "(Examples: ANDROID NON ROOT, ANDROID ROOT, PC, IOS)\n\n"
                 "Cancel karne ke liye /cancel bhejo."
@@ -3630,14 +3629,14 @@ Payment will be auto-detected!
             products = db.get_all_products_flat()
             context.user_data["rm_products"] = products
             if not products:
-                text = "ðŸ“¦ <b>Koi product nahi hai.</b>"
+                text = "📦 <b>Koi product nahi hai.</b>"
                 keyboard = [[CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_panel")]]
                 await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
             else:
-                text = "ðŸ—‘ <b>REMOVE PRODUCT</b>\n\nJis product ko delete karna hai use dabao:"
+                text = "🗑 <b>REMOVE PRODUCT</b>\n\nJis product ko delete karna hai use dabao:"
                 keyboard = []
                 for i, (category, name, plan_count) in enumerate(products):
-                    label = f"{name} ({category}) â€” {plan_count} plan(s)"
+                    label = f"{name} ({category}) — {plan_count} plan(s)"
                     cb = encode_cb("admin_rmprod_select", i)
                     keyboard.append([CB(label, style="danger", icon=get_button_emoji("remove"), callback_data=cb)])
                 keyboard.append([CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_panel")])
@@ -3648,14 +3647,14 @@ Payment will be auto-detected!
             idx = int(parts[1])
             products = context.user_data.get("rm_products", [])
             if idx >= len(products):
-                await safe_answer(query, "âŒ List purani ho gayi, dobara kholo.", show_alert=True)
+                await safe_answer(query, "❌ List purani ho gayi, dobara kholo.", show_alert=True)
                 return
             category, name, plan_count = products[idx]
             text = (
-                f"âš ï¸ <b>Confirm Delete</b>\n\n"
-                f"ðŸ›ï¸ <b>Product:</b> {name}\n"
-                f"ðŸ“‚ <b>Category:</b> {category}\n"
-                f"â³ <b>Plans:</b> {plan_count}\n\n"
+                f"⚠️ <b>Confirm Delete</b>\n\n"
+                f"🛍️ <b>Product:</b> {name}\n"
+                f"📂 <b>Category:</b> {category}\n"
+                f"⏳ <b>Plans:</b> {plan_count}\n\n"
                 f"Yeh product aur iske saare plans permanently delete ho jaayenge. Pakka?"
             )
             keyboard = [
@@ -3669,14 +3668,14 @@ Payment will be auto-detected!
             idx = int(parts[1])
             products = context.user_data.get("rm_products", [])
             if idx >= len(products):
-                await safe_answer(query, "âŒ List purani ho gayi, dobara kholo.", show_alert=True)
+                await safe_answer(query, "❌ List purani ho gayi, dobara kholo.", show_alert=True)
                 return
             category, name, plan_count = products[idx]
             deleted = db.delete_product(category, name)
             if deleted:
-                text = f"âœ… <b>Deleted!</b>\n\nðŸ“¦ {name} ({category}) ke {deleted} plan(s) remove ho gaye."
+                text = f"✅ <b>Deleted!</b>\n\n📦 {name} ({category}) ke {deleted} plan(s) remove ho gaye."
             else:
-                text = "âŒ Product nahi mila (shayad pehle hi delete ho chuka hai)."
+                text = "❌ Product nahi mila (shayad pehle hi delete ho chuka hai)."
             keyboard = [[CB("Back to Admin Panel", style="danger", icon=get_button_emoji("back"), callback_data="admin_panel")]]
             await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
 
@@ -3684,11 +3683,11 @@ Payment will be auto-detected!
             products = db.get_all_products_flat()
             context.user_data["voicelink_products"] = products
             if not products:
-                text = "ðŸ“¦ <b>Koi product nahi hai.</b>"
+                text = "📦 <b>Koi product nahi hai.</b>"
                 keyboard = [[CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_panel")]]
                 await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
             else:
-                text = "ðŸ”ŠðŸ”— <b>MANAGE VOICE / LINK</b>\n\nJis product ka Voice/Link set karna hai use chuno:"
+                text = "🔊🔗 <b>MANAGE VOICE / LINK</b>\n\nJis product ka Voice/Link set karna hai use chuno:"
                 keyboard = []
                 for i, (category, name, plan_count) in enumerate(products):
                     label = f"{name} ({category})"
@@ -3702,7 +3701,7 @@ Payment will be auto-detected!
             idx = int(parts[1])
             products = context.user_data.get("voicelink_products", [])
             if idx >= len(products):
-                await safe_answer(query, "âŒ Error: Invalid selection.", show_alert=True)
+                await safe_answer(query, "❌ Error: Invalid selection.", show_alert=True)
                 return
             category, name, _ = products[idx]
             cat_products = db.db.products.find({"category": category, "name": name})
@@ -3712,13 +3711,13 @@ Payment will be auto-detected!
                 break
             
             if not first_plan:
-                await safe_answer(query, "âŒ Error: Product not found.", show_alert=True)
+                await safe_answer(query, "❌ Error: Product not found.", show_alert=True)
                 return
                 
             product_id = first_plan.get("product_id")
             context.user_data["vl_product_id"] = product_id
             
-            text = f"ðŸ”ŠðŸ”— <b>Manage Extras</b>\n\n<b>Product:</b> {name} ({category})\n\nKya set karna chahte ho?"
+            text = f"🔊🔗 <b>Manage Extras</b>\n\n<b>Product:</b> {name} ({category})\n\nKya set karna chahte ho?"
             keyboard = [
                 [CB("Set Voice", style="primary", icon=get_button_emoji("add"), callback_data=f"admin_setvl_voice"),
                  CB("View", style="primary", icon=get_button_emoji("star"), callback_data=f"admin_viewvl_voice"),
@@ -3734,7 +3733,7 @@ Payment will be auto-detected!
             product_id = context.user_data.get("vl_product_id")
             if not product_id: return
             context.user_data["awaiting_product_voice"] = product_id
-            text = "ðŸŽ™ <b>Ab koi Voice message ya Forwarded message bhejo</b> is product ke delivery ke liye.\n\nCancel karne ke liye /cancel bhejo."
+            text = "🎙 <b>Ab koi Voice message ya Forwarded message bhejo</b> is product ke delivery ke liye.\n\nCancel karne ke liye /cancel bhejo."
             keyboard = [[CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_voicelink")]]
             await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
 
@@ -3742,7 +3741,7 @@ Payment will be auto-detected!
             product_id = context.user_data.get("vl_product_id")
             if not product_id: return
             context.user_data["awaiting_product_link"] = product_id
-            text = "ðŸ”— <b>Ab ek Link (URL) bhejo</b> is product ke liye.\n\nCancel karne ke liye /cancel bhejo."
+            text = "🔗 <b>Ab ek Link (URL) bhejo</b> is product ke liye.\n\nCancel karne ke liye /cancel bhejo."
             keyboard = [[CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_voicelink")]]
             await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
 
@@ -3761,7 +3760,7 @@ Payment will be auto-detected!
                 await safe_answer(query, "Sending voice...")
                 await context.bot.send_voice(chat_id=user_id, voice=voice_id)
             else:
-                await safe_answer(query, "âŒ No delivery message/voice set for this product.", show_alert=True)
+                await safe_answer(query, "❌ No delivery message/voice set for this product.", show_alert=True)
                 
         elif data == "admin_rmvl_voice":
             product_id = context.user_data.get("vl_product_id")
@@ -3777,7 +3776,7 @@ Payment will be auto-detected!
                  CB("Remove", style="danger", icon=get_button_emoji("remove"), callback_data="admin_rmvl_link")],
                 [CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_voicelink")]
             ]
-            await safe_edit(query, text="âœ… <b>Voice has been successfully REMOVED!</b>\n\nYou can set a new one or go back.", reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
+            await safe_edit(query, text="✅ <b>Voice has been successfully REMOVED!</b>\n\nYou can set a new one or go back.", reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
 
         elif data == "admin_viewvl_link":
             product_id = context.user_data.get("vl_product_id")
@@ -3785,9 +3784,9 @@ Payment will be auto-detected!
             prod = db.db.products.find_one({"product_id": product_id})
             if prod and prod.get("product_link"):
                 await safe_answer(query, "Sending link...")
-                await context.bot.send_message(chat_id=user_id, text=f"ðŸ”— <b>Link for Product:</b>\n{prod['product_link']}", parse_mode="HTML")
+                await context.bot.send_message(chat_id=user_id, text=f"🔗 <b>Link for Product:</b>\n{prod['product_link']}", parse_mode="HTML")
             else:
-                await safe_answer(query, "âŒ No link set for this product.", show_alert=True)
+                await safe_answer(query, "❌ No link set for this product.", show_alert=True)
 
         elif data == "admin_rmvl_link":
             product_id = context.user_data.get("vl_product_id")
@@ -3803,20 +3802,20 @@ Payment will be auto-detected!
                  CB("Remove", style="danger", icon=get_button_emoji("remove"), callback_data="admin_rmvl_link")],
                 [CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_voicelink")]
             ]
-            await safe_edit(query, text="âœ… <b>Link has been successfully REMOVED!</b>\n\nYou can set a new one or go back.", reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
+            await safe_edit(query, text="✅ <b>Link has been successfully REMOVED!</b>\n\nYou can set a new one or go back.", reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
 
         elif data == "admin_changeprice":
             products = db.get_all_products_flat()
             context.user_data["price_products"] = products
             if not products:
-                text = "ðŸ“¦ <b>Koi product nahi hai.</b>"
+                text = "📦 <b>Koi product nahi hai.</b>"
                 keyboard = [[CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_panel")]]
                 await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
             else:
-                text = "ðŸ’° <b>CHANGE PRICE</b>\n\nJis product ka price change karna hai use chuno:"
+                text = "💰 <b>CHANGE PRICE</b>\n\nJis product ka price change karna hai use chuno:"
                 keyboard = []
                 for i, (category, name, plan_count) in enumerate(products):
-                    label = f"{name} ({category}) â€” {plan_count} plan(s)"
+                    label = f"{name} ({category}) — {plan_count} plan(s)"
                     cb = encode_cb("admin_priceprod_select", i)
                     keyboard.append([CB(label, style="primary", icon=get_button_emoji("star"), callback_data=cb)])
                 keyboard.append([CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_panel")])
@@ -3827,7 +3826,7 @@ Payment will be auto-detected!
             idx = int(parts[1])
             products = context.user_data.get("price_products", [])
             if idx >= len(products):
-                await safe_answer(query, "âŒ List purani ho gayi, dobara kholo.", show_alert=True)
+                await safe_answer(query, "❌ List purani ho gayi, dobara kholo.", show_alert=True)
                 return
             category, name, plan_count = products[idx]
             all_products = db.get_products()
@@ -3835,14 +3834,14 @@ Payment will be auto-detected!
             plan_ids = all_products.get(category, {}).get(name, {}).get("plan_ids", {})
 
             if not plans:
-                await safe_answer(query, "âŒ Is product ke plans nahi mile.", show_alert=True)
+                await safe_answer(query, "❌ Is product ke plans nahi mile.", show_alert=True)
                 return
 
-            text = f"ðŸ’° <b>{name}</b> ({category})\n\nJis plan ka price change karna hai use chuno:"
+            text = f"💰 <b>{name}</b> ({category})\n\nJis plan ka price change karna hai use chuno:"
             keyboard = []
             for plan_name, price in plans.items():
                 plan_row_id = plan_ids.get(plan_name)
-                label = f"{plan_name} â€” â‚¹{price:.0f}"
+                label = f"{plan_name} — ₹{price:.0f}"
                 keyboard.append([CB(label, style="primary", icon=get_button_emoji("add_balance"), callback_data=f"admin_priceplan_{plan_row_id}")])
             keyboard.append([CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_changeprice")])
             await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
@@ -3851,14 +3850,14 @@ Payment will be auto-detected!
             plan_row_id = int(data.replace("admin_priceplan_", ""))
             plan = db.get_plan_by_id(plan_row_id)
             if not plan:
-                await safe_answer(query, "âŒ Plan not found.", show_alert=True)
+                await safe_answer(query, "❌ Plan not found.", show_alert=True)
                 return
             context.user_data["awaiting_newprice_id"] = plan_row_id
             text = (
-                f"ðŸ’° <b>Change Price</b>\n\n"
-                f"ðŸ›ï¸ <b>Product:</b> {plan['name']}\n"
-                f"â³ <b>Plan:</b> {plan['plan']}\n"
-                f"ðŸ’µ <b>Current Price:</b> â‚¹{plan['price']:.2f}\n\n"
+                f"💰 <b>Change Price</b>\n\n"
+                f"🛍️ <b>Product:</b> {plan['name']}\n"
+                f"⏳ <b>Plan:</b> {plan['plan']}\n"
+                f"💵 <b>Current Price:</b> ₹{plan['price']:.2f}\n\n"
                 f"Naya price type karo (sirf number, jaise 150):\n\n"
                 f"Cancel karne ke liye /cancel bhejo."
             )
@@ -3867,9 +3866,9 @@ Payment will be auto-detected!
 
         elif data == "admin_welcomemedia":
             media_type, _ = db.get_welcome_media()
-            status = {"photo": "ðŸ“· Photo set hai", "video": "ðŸŽ¥ Video set hai"}.get(media_type, "âŒ Kuch set nahi hai (sirf text)")
+            status = {"photo": "📷 Photo set hai", "video": "🎥 Video set hai"}.get(media_type, "❌ Kuch set nahi hai (sirf text)")
             text = (
-                "ðŸ–¼ <b>WELCOME MEDIA</b>\n\n"
+                "🖼 <b>WELCOME MEDIA</b>\n\n"
                 "Jab koi user /start karega ya Main Menu pe wapas aayega, "
                 "text ke saath ye photo/video dikhega.\n\n"
                 f"<b>Current status:</b> {status}"
@@ -3879,10 +3878,10 @@ Payment will be auto-detected!
         elif data == "admin_trending_menu":
             status = db.get_setting("trending_enabled")
             if status is None: status = "0"
-            status_text = "ðŸŸ¢ ON" if status == "1" else "ðŸ”´ OFF"
+            status_text = "🟢 ON" if status == "1" else "🔴 OFF"
             
             text = (
-                f"ðŸ”¥ <b>Trending Product Menu</b>\n\n"
+                f"🔥 <b>Trending Product Menu</b>\n\n"
                 f"<b>Status:</b> {status_text}\n\n"
                 f"Users will see the trending product right before the main menu when they type /start. It will also be Pinned."
             )
@@ -3900,9 +3899,9 @@ Payment will be auto-detected!
             new_status = "0" if status == "1" else "1"
             db.set_setting("trending_enabled", new_status)
             
-            status_text = "ðŸŸ¢ ON" if new_status == "1" else "ðŸ”´ OFF"
+            status_text = "🟢 ON" if new_status == "1" else "🔴 OFF"
             text = (
-                f"ðŸ”¥ <b>Trending Product Menu</b>\n\n"
+                f"🔥 <b>Trending Product Menu</b>\n\n"
                 f"<b>Status:</b> {status_text}\n\n"
                 f"Users will see the trending product right before the main menu when they type /start. It will also be Pinned."
             )
@@ -3917,13 +3916,13 @@ Payment will be auto-detected!
             
         elif data == "admin_set_trending":
             context.user_data["awaiting_trending_product"] = True
-            text = "ðŸ”¥ <b>Ab koi bhi message bhejo ya Forward karo</b> (Photo, Video, Text, etc.). Jo bhejo ge wo as-it-is save ho jayega!\n\nCancel karne ke liye /cancel bhejo."
+            text = "🔥 <b>Ab koi bhi message bhejo ya Forward karo</b> (Photo, Video, Text, etc.). Jo bhejo ge wo as-it-is save ho jayega!\n\nCancel karne ke liye /cancel bhejo."
             keyboard = [[CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_trending_menu")]]
             await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
             
         elif data == "admin_set_trending_voice":
             context.user_data["awaiting_trending_voice"] = True
-            text = "ðŸŽ™ <b>Ab koi Dusra message bhejo ya Forward karo</b> (Jaise Voice message with caption, ya koi aur photo).\n\nCancel karne ke liye /cancel bhejo."
+            text = "🎙 <b>Ab koi Dusra message bhejo ya Forward karo</b> (Jaise Voice message with caption, ya koi aur photo).\n\nCancel karne ke liye /cancel bhejo."
             keyboard = [[CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_trending_menu")]]
             await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
             
@@ -3933,11 +3932,11 @@ Payment will be auto-detected!
             db.delete_setting("trending_voice_chat_id")
             db.delete_setting("trending_voice_msg_id")
             db.set_setting("trending_enabled", "0")
-            await safe_answer(query, "ðŸ”¥ Trending product & Voice cleared!", show_alert=True)
+            await safe_answer(query, "🔥 Trending product & Voice cleared!", show_alert=True)
             # Send back to trending menu
-            status_text = "ðŸ”´ OFF"
+            status_text = "🔴 OFF"
             text = (
-                f"ðŸ”¥ <b>Trending Product Menu</b>\n\n"
+                f"🔥 <b>Trending Product Menu</b>\n\n"
                 f"<b>Status:</b> {status_text}\n\n"
                 f"Users will see the trending product right before the main menu when they type /start. It will also be Pinned."
             )
@@ -3952,32 +3951,32 @@ Payment will be auto-detected!
 
         elif data == "admin_setwelcomephoto":
             context.user_data["awaiting_welcome_photo"] = True
-            text = "ðŸ“· <b>Ab ek photo bhejo</b> jo welcome message mein use hogi.\n\nCancel karne ke liye /cancel bhejo."
+            text = "📷 <b>Ab ek photo bhejo</b> jo welcome message mein use hogi.\n\nCancel karne ke liye /cancel bhejo."
             keyboard = [[CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_welcomemedia")]]
             await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
 
         elif data == "admin_setwelcomevideo":
             context.user_data["awaiting_welcome_video"] = True
-            text = "ðŸŽ¥ <b>Ab ek video bhejo</b> jo welcome message mein use hogi.\n\nCancel karne ke liye /cancel bhejo."
+            text = "🎥 <b>Ab ek video bhejo</b> jo welcome message mein use hogi.\n\nCancel karne ke liye /cancel bhejo."
             keyboard = [[CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_welcomemedia")]]
             await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
 
         elif data == "admin_removewelcomemedia":
             db.clear_welcome_media()
-            text = "âœ… <b>Welcome media hata di gayi.</b>\n\nAb welcome message sirf text mein aayega."
+            text = "✅ <b>Welcome media hata di gayi.</b>\n\nAb welcome message sirf text mein aayega."
             keyboard = [[CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_welcomemedia")]]
             await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
 
         elif data == "admin_menumedia":
             text = (
-                "ðŸ–¼ <b>MENU MEDIA</b>\n\n"
-                "In mein se kisi bhi screen ke liye photo/video set kar sakte ho â€” jab bhi user "
+                "🖼 <b>MENU MEDIA</b>\n\n"
+                "In mein se kisi bhi screen ke liye photo/video set kar sakte ho — jab bhi user "
                 "us button pe jaayega, text ke saath ye media dikhegi.\n\nEk screen chuno:"
             )
             keyboard = []
             for key, label in SCREEN_LABELS.items():
                 media_type, _ = db.get_screen_media(key)
-                status = "âœ…" if media_type else "â–«ï¸"
+                status = "✅" if media_type else "▫️"
                 keyboard.append([CB(f"{status} {label}", style="primary", icon=get_button_emoji("star"), callback_data=f"admin_screenmedia_{key}")])
             keyboard.append([CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_panel")])
             await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
@@ -3986,8 +3985,8 @@ Payment will be auto-detected!
             screen_key = data.replace("admin_screenmedia_", "")
             label = SCREEN_LABELS.get(screen_key, screen_key)
             media_type, _ = db.get_screen_media(screen_key)
-            status = {"photo": "ðŸ“· Photo set hai", "video": "ðŸŽ¥ Video set hai"}.get(media_type, "âŒ Koi media set nahi hai")
-            text = f"ðŸ–¼ <b>{label}</b>\n\nCurrent status: {status}"
+            status = {"photo": "📷 Photo set hai", "video": "🎥 Video set hai"}.get(media_type, "❌ Koi media set nahi hai")
+            text = f"🖼 <b>{label}</b>\n\nCurrent status: {status}"
             keyboard = [
                 [CB("Set Photo", style="primary", icon=get_button_emoji("add"), callback_data=f"admin_setscreenphoto_{screen_key}")],
                 [CB("Set Video", style="primary", icon=get_button_emoji("add"), callback_data=f"admin_setscreenvideo_{screen_key}")],
@@ -4001,7 +4000,7 @@ Payment will be auto-detected!
             screen_key = data.replace("admin_setscreenphoto_", "")
             context.user_data["awaiting_screen_photo"] = screen_key
             label = SCREEN_LABELS.get(screen_key, screen_key)
-            text = f"ðŸ“· <b>Ab ek photo bhejo</b> jo <b>{label}</b> screen ke liye use hogi.\n\nCancel karne ke liye /cancel bhejo."
+            text = f"📷 <b>Ab ek photo bhejo</b> jo <b>{label}</b> screen ke liye use hogi.\n\nCancel karne ke liye /cancel bhejo."
             keyboard = [[CB("Back", style="danger", icon=get_button_emoji("back"), callback_data=f"admin_screenmedia_{screen_key}")]]
             await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
 
@@ -4011,7 +4010,7 @@ Payment will be auto-detected!
             context.user_data["awaiting_text_key"] = screen_key
             context.user_data["awaiting_emoji_key"] = screen_key
             label = SCREEN_LABELS.get(screen_key, screen_key)
-            text = f"ðŸŽ¥ <b>Ab ek video bhejo</b> jo <b>{label}</b> screen ke liye use hogi.\n\nCancel karne ke liye /cancel bhejo."
+            text = f"🎥 <b>Ab ek video bhejo</b> jo <b>{label}</b> screen ke liye use hogi.\n\nCancel karne ke liye /cancel bhejo."
             keyboard = [[CB("Back", style="danger", icon=get_button_emoji("back"), callback_data=f"admin_screenmedia_{screen_key}")]]
             await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
 
@@ -4019,14 +4018,14 @@ Payment will be auto-detected!
             screen_key = data.replace("admin_removescreenmedia_", "")
             db.clear_screen_media(screen_key)
             label = SCREEN_LABELS.get(screen_key, screen_key)
-            text = f"âœ… <b>{label}</b> ki media hata di gayi."
+            text = f"✅ <b>{label}</b> ki media hata di gayi."
             keyboard = [[CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_menumedia")]]
             await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
 
         elif data == "admin_addbalance":
             context.user_data["awaiting_addbalance"] = True
             text = (
-                "ðŸ’° <b>ADD BALANCE TO USER</b>\n\n"
+                "💰 <b>ADD BALANCE TO USER</b>\n\n"
                 "Reply is format mein:\n"
                 "<code>USER_ID AMOUNT</code>\n\n"
                 "Example:\n"
@@ -4039,7 +4038,7 @@ Payment will be auto-detected!
         elif data == "admin_removebalance":
             context.user_data["awaiting_removebalance"] = True
             text = (
-                "ðŸ’¸ <b>REMOVE BALANCE FROM USER</b>\n\n"
+                "💸 <b>REMOVE BALANCE FROM USER</b>\n\n"
                 "Reply is format mein:\n"
                 "<code>USER_ID AMOUNT</code>\n\n"
                 "Example:\n"
@@ -4051,13 +4050,13 @@ Payment will be auto-detected!
         elif data == "admin_stats":
             stats = db.get_stats()
             text = f"""
-    <tg-emoji emoji-id="6073308817125282940">ðŸ“Š</tg-emoji> <b>BOT STATISTICS</b>
-    â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
-    <tg-emoji emoji-id="5301276827782755360">ðŸ‘¥</tg-emoji> <b>Total Users:</b> {stats[0]}
-    <tg-emoji emoji-id="6033106828018062225">ðŸ’°</tg-emoji> <b>Total Wallet Balance:</b> â‚¹{stats[1]:.2f}
-    <tg-emoji emoji-id="6294257044526469584">ðŸ“‹</tg-emoji> <b>Total Orders:</b> {stats[2]}
-    <tg-emoji emoji-id="6033106828018062225">ðŸ’°</tg-emoji> <b>Total Deposited:</b> â‚¹{stats[3]:.2f}
-    â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
+    <tg-emoji emoji-id="6073308817125282940">📊</tg-emoji> <b>BOT STATISTICS</b>
+    ━━━━━━━━━━━━━━━━━━
+    <tg-emoji emoji-id="5301276827782755360">👥</tg-emoji> <b>Total Users:</b> {stats[0]}
+    <tg-emoji emoji-id="6033106828018062225">💰</tg-emoji> <b>Total Wallet Balance:</b> ₹{stats[1]:.2f}
+    <tg-emoji emoji-id="6294257044526469584">📋</tg-emoji> <b>Total Orders:</b> {stats[2]}
+    <tg-emoji emoji-id="6033106828018062225">💰</tg-emoji> <b>Total Deposited:</b> ₹{stats[3]:.2f}
+    ━━━━━━━━━━━━━━━━━━
     """
             keyboard = [[CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_panel")]]
             await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
@@ -4066,28 +4065,28 @@ Payment will be auto-detected!
             recent = db.get_recent_users(limit=25)
             total = len(db.get_all_user_ids())
             if recent:
-                lines = [f"â€¢ <code>{uid}</code> â€” @{uname or 'N/A'} â€” â‚¹{bal:.2f}" for uid, uname, bal in recent]
+                lines = [f"• <code>{uid}</code> — @{uname or 'N/A'} — ₹{bal:.2f}" for uid, uname, bal in recent]
                 preview = "\n".join(lines)
             else:
                 preview = "(No users yet)"
             text = (
-                f'<tg-emoji emoji-id="5301276827782755360">ðŸ‘¥</tg-emoji> <b>ALL USERS (Total: {total})</b>\n'
-                "â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”\n"
+                f'<tg-emoji emoji-id="5301276827782755360">👥</tg-emoji> <b>ALL USERS (Total: {total})</b>\n'
+                "━━━━━━━━━━━━━━━━━━\n"
                 f"{preview}\n"
-                "â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”\n"
+                "━━━━━━━━━━━━━━━━━━\n"
                 "<i>Showing most recent 25 users.</i>"
             )
             keyboard = [[CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_panel")]]
             await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
 
         elif data == "admin_resellers":
-            await safe_answer(query, "ðŸš§ Manage Resellers is currently under construction. Coming soon!", show_alert=True)
+            await safe_answer(query, "🚧 Manage Resellers is currently under construction. Coming soon!", show_alert=True)
 
         elif data == "admin_manage_captions":
-            text = "ðŸ“ <b>MANAGE CAPTIONS</b>\n\nChoose what you want to customize:"
+            text = "📝 <b>MANAGE CAPTIONS</b>\n\nChoose what you want to customize:"
             keyboard = [
-                [CB("ðŸ“ Category Captions", style="primary", icon="", callback_data="admin_list_cat_captions")],
-                [CB("ðŸ›’ Product Captions", style="primary", icon="", callback_data="admin_list_prod_captions")],
+                [CB("📁 Category Captions", style="primary", icon="", callback_data="admin_list_cat_captions")],
+                [CB("🛒 Product Captions", style="primary", icon="", callback_data="admin_list_prod_captions")],
                 [CB("Back to Admin Panel", style="danger", icon=get_button_emoji("back"), callback_data="admin_panel")]
             ]
             await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
@@ -4103,19 +4102,19 @@ Payment will be auto-detected!
                     if c not in order_list:
                         order_list.append(c)
             
-            text = "ðŸ“ <b>CATEGORY CAPTIONS</b>\n\nSelect a category to change its caption:"
+            text = "📝 <b>CATEGORY CAPTIONS</b>\n\nSelect a category to change its caption:"
             keyboard = []
             for c in order_list:
-                keyboard.append([CB(f"ðŸ“ {c}", style="primary", icon="", callback_data=encode_cb("admin_edit_cap", "cat", c))])
+                keyboard.append([CB(f"📁 {c}", style="primary", icon="", callback_data=encode_cb("admin_edit_cap", "cat", c))])
             keyboard.append([CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_manage_captions")])
             await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
 
         elif data == "admin_list_prod_captions":
             prods_flat = db.get_all_products_flat()
-            text = "ðŸ“ <b>PRODUCT CAPTIONS</b>\n\nSelect a product to change its caption:"
+            text = "📝 <b>PRODUCT CAPTIONS</b>\n\nSelect a product to change its caption:"
             keyboard = []
             for p in prods_flat:
-                keyboard.append([CB(f"ðŸ›’ {p[1]}", style="primary", icon="", callback_data=encode_cb("admin_edit_cap", "prod", p[1]))])
+                keyboard.append([CB(f"🛒 {p[1]}", style="primary", icon="", callback_data=encode_cb("admin_edit_cap", "prod", p[1]))])
             keyboard.append([CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_manage_captions")])
             await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
 
@@ -4126,13 +4125,13 @@ Payment will be auto-detected!
             key = f"{cap_type}_{name}"
             
             if cap_type == "cat":
-                default_text = f"<b>ðŸ“ Category: {name}</b>\n\nSelect a product to purchase:"
+                default_text = f"<b>📁 Category: {name}</b>\n\nSelect a product to purchase:"
             else:
-                default_text = f"<b>ðŸ›’ Product: {name}</b>\n\nChoose expiration pack period below:"
+                default_text = f"<b>🛒 Product: {name}</b>\n\nChoose expiration pack period below:"
                 
             current_text = get_text_safe(key, default_text)
             
-            text = f"ðŸ“ <b>EDITING CAPTION</b>\n\n<b>Type:</b> {cap_type.upper()}\n<b>Name:</b> {name}\n\n<b>Current Caption:</b>\n<blockquote>{current_text}</blockquote>\n\nClick 'Change' to set a new caption, or 'Reset' to restore the default."
+            text = f"📝 <b>EDITING CAPTION</b>\n\n<b>Type:</b> {cap_type.upper()}\n<b>Name:</b> {name}\n\n<b>Current Caption:</b>\n<blockquote>{current_text}</blockquote>\n\nClick 'Change' to set a new caption, or 'Reset' to restore the default."
             
             keyboard = [
                 [CB("Change Text", style="primary", icon="", callback_data=encode_cb("admin_change_cap", key))],
@@ -4145,7 +4144,7 @@ Payment will be auto-detected!
             key = decode_cb(data)[1]
             context.user_data["awaiting_custom_text"] = key
             
-            text = f"âœï¸ <b>Send me the new text for <code>{key}</code>!</b>\n\nYou can use HTML tags like <code>&lt;b&gt;bold&lt;/b&gt;</code>.\n\nType /cancel to abort."
+            text = f"✏️ <b>Send me the new text for <code>{key}</code>!</b>\n\nYou can use HTML tags like <code>&lt;b&gt;bold&lt;/b&gt;</code>.\n\nType /cancel to abort."
             keyboard = [[CB("Cancel", style="danger", icon=get_button_emoji("cancel"), callback_data="admin_manage_captions")]]
             await safe_edit(query, text=text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
 
@@ -4156,7 +4155,7 @@ Payment will be auto-detected!
             
             cap_type = key.split("_", 1)[0]
             keyboard = [[CB("Back", style="danger", icon=get_button_emoji("back"), callback_data=f"admin_list_{cap_type}_captions")]]
-            await safe_edit(query, text=f"âœ… <b>Successfully reset {key}!</b>", reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
+            await safe_edit(query, text=f"✅ <b>Successfully reset {key}!</b>", reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
 
         elif data == "admin_reorder_store":
             cat_order_str = db.get_setting("category_order")
@@ -4169,13 +4168,13 @@ Payment will be auto-detected!
                     if c not in order_list:
                         order_list.append(c)
                 
-            text = "ðŸ”„ <b>REORDER STORE</b>\n\nClick â¬†ï¸ or â¬‡ï¸ to move Categories. Click on a Category name to reorder its Products."
+            text = "🔄 <b>REORDER STORE</b>\n\nClick ⬆️ or ⬇️ to move Categories. Click on a Category name to reorder its Products."
             keyboard = []
             for i, c in enumerate(order_list):
                 row = [
-                    CB(f"ðŸ“ {c}", style="primary", icon="", callback_data=encode_cb("admin_reorder_catprod", c)),
-                    CB("â¬†ï¸", style="primary", icon="", callback_data=encode_cb("admin_reorder_cat_up", i)),
-                    CB("â¬‡ï¸", style="primary", icon="", callback_data=encode_cb("admin_reorder_cat_down", i))
+                    CB(f"📁 {c}", style="primary", icon="", callback_data=encode_cb("admin_reorder_catprod", c)),
+                    CB("⬆️", style="primary", icon="", callback_data=encode_cb("admin_reorder_cat_up", i)),
+                    CB("⬇️", style="primary", icon="", callback_data=encode_cb("admin_reorder_cat_down", i))
                 ]
                 keyboard.append(row)
             keyboard.append([CB("Back to Admin Panel", style="danger", icon=get_button_emoji("back"), callback_data="admin_panel")])
@@ -4203,13 +4202,13 @@ Payment will be auto-detected!
             
             db.set_setting("category_order", ",".join(order_list))
             
-            text = "ðŸ”„ <b>REORDER STORE</b>\n\nClick â¬†ï¸ or â¬‡ï¸ to move Categories. Click on a Category name to reorder its Products."
+            text = "🔄 <b>REORDER STORE</b>\n\nClick ⬆️ or ⬇️ to move Categories. Click on a Category name to reorder its Products."
             keyboard = []
             for i, c in enumerate(order_list):
                 row = [
-                    CB(f"ðŸ“ {c}", style="primary", icon="", callback_data=encode_cb("admin_reorder_catprod", c)),
-                    CB("â¬†ï¸", style="primary", icon="", callback_data=encode_cb("admin_reorder_cat_up", i)),
-                    CB("â¬‡ï¸", style="primary", icon="", callback_data=encode_cb("admin_reorder_cat_down", i))
+                    CB(f"📁 {c}", style="primary", icon="", callback_data=encode_cb("admin_reorder_catprod", c)),
+                    CB("⬆️", style="primary", icon="", callback_data=encode_cb("admin_reorder_cat_up", i)),
+                    CB("⬇️", style="primary", icon="", callback_data=encode_cb("admin_reorder_cat_down", i))
                 ]
                 keyboard.append(row)
             keyboard.append([CB("Back to Admin Panel", style="danger", icon=get_button_emoji("back"), callback_data="admin_panel")])
@@ -4225,13 +4224,13 @@ Payment will be auto-detected!
                     db.db.products.update_one({"_id": p["_id"]}, {"$set": {"order": i}})
                     p["order"] = i
             
-            text = f"ðŸ”„ <b>REORDER PRODUCTS</b>\n\nCategory: <b>{cat_name}</b>\n\nClick â¬†ï¸ or â¬‡ï¸ to change product position."
+            text = f"🔄 <b>REORDER PRODUCTS</b>\n\nCategory: <b>{cat_name}</b>\n\nClick ⬆️ or ⬇️ to change product position."
             keyboard = []
             for i, p in enumerate(prods):
                 row = [
                     CB(p["name"], style="primary", icon="", callback_data="ignore"),
-                    CB("â¬†ï¸", style="primary", icon="", callback_data=encode_cb("admin_reorder_prod_up", cat_name, i)),
-                    CB("â¬‡ï¸", style="primary", icon="", callback_data=encode_cb("admin_reorder_prod_down", cat_name, i))
+                    CB("⬆️", style="primary", icon="", callback_data=encode_cb("admin_reorder_prod_up", cat_name, i)),
+                    CB("⬇️", style="primary", icon="", callback_data=encode_cb("admin_reorder_prod_down", cat_name, i))
                 ]
                 keyboard.append(row)
             keyboard.append([CB("Back to Categories", style="danger", icon=get_button_emoji("back"), callback_data="admin_reorder_store")])
@@ -4262,13 +4261,13 @@ Payment will be auto-detected!
                 db.db.products.update_one({"_id": p2["_id"]}, {"$set": {"order": idx}})
                 prods[idx], prods[idx+1] = prods[idx+1], prods[idx]
             
-            text = f"ðŸ”„ <b>REORDER PRODUCTS</b>\n\nCategory: <b>{cat_name}</b>\n\nClick â¬†ï¸ or â¬‡ï¸ to change product position."
+            text = f"🔄 <b>REORDER PRODUCTS</b>\n\nCategory: <b>{cat_name}</b>\n\nClick ⬆️ or ⬇️ to change product position."
             keyboard = []
             for i, p in enumerate(prods):
                 row = [
                     CB(p["name"], style="primary", icon="", callback_data="ignore"),
-                    CB("â¬†ï¸", style="primary", icon="", callback_data=encode_cb("admin_reorder_prod_up", cat_name, i)),
-                    CB("â¬‡ï¸", style="primary", icon="", callback_data=encode_cb("admin_reorder_prod_down", cat_name, i))
+                    CB("⬆️", style="primary", icon="", callback_data=encode_cb("admin_reorder_prod_up", cat_name, i)),
+                    CB("⬇️", style="primary", icon="", callback_data=encode_cb("admin_reorder_prod_down", cat_name, i))
                 ]
                 keyboard.append(row)
             keyboard.append([CB("Back to Categories", style="danger", icon=get_button_emoji("back"), callback_data="admin_reorder_store")])
@@ -4277,9 +4276,9 @@ Payment will be auto-detected!
         elif data == "admin_welcome_reaction":
             status = db.get_setting("welcome_reaction_enabled")
             if status is None: status = "1"
-            status_text = "ðŸŸ¢ ON" if status == "1" else "ðŸ”´ OFF"
+            status_text = "🟢 ON" if status == "1" else "🔴 OFF"
             context.user_data["awaiting_welcome_reaction"] = True
-            text = "ðŸŒŸ <b>SET WELCOME REACTION</b>\n\nSend a standard emoji (like ðŸ¦„, ðŸ”¥) or a Premium Emoji to set as the reaction for /start.\n\nType /cancel to abort."
+            text = "🌟 <b>SET WELCOME REACTION</b>\n\nSend a standard emoji (like 🦄, 🔥) or a Premium Emoji to set as the reaction for /start.\n\nType /cancel to abort."
             keyboard = [
                 [CB(f"Status: {status_text}", style="primary", icon="", callback_data="admin_toggle_reaction")],
                 [CB("Clear Reaction", style="danger", icon=get_button_emoji("clear"), callback_data="admin_clear_reaction")]
@@ -4292,8 +4291,8 @@ Payment will be auto-detected!
             new_status = "0" if status == "1" else "1"
             db.set_setting("welcome_reaction_enabled", new_status)
             
-            status_text = "ðŸŸ¢ ON" if new_status == "1" else "ðŸ”´ OFF"
-            text = "ðŸŒŸ <b>SET WELCOME REACTION</b>\n\nSend a standard emoji (like ðŸ¦„, ðŸ”¥) or a Premium Emoji to set as the reaction for /start.\n\nType /cancel to abort."
+            status_text = "🟢 ON" if new_status == "1" else "🔴 OFF"
+            text = "🌟 <b>SET WELCOME REACTION</b>\n\nSend a standard emoji (like 🦄, 🔥) or a Premium Emoji to set as the reaction for /start.\n\nType /cancel to abort."
             keyboard = [
                 [CB(f"Status: {status_text}", style="primary", icon="", callback_data="admin_toggle_reaction")],
                 [CB("Clear Reaction", style="danger", icon=get_button_emoji("clear"), callback_data="admin_clear_reaction")]
@@ -4304,7 +4303,7 @@ Payment will be auto-detected!
             db.set_setting("welcome_reaction", "")
             context.user_data["awaiting_welcome_reaction"] = False
             await safe_answer(query, "Welcome reaction cleared!", show_alert=True)
-            text = "ðŸ›  <b>ADMIN PANEL</b>\n\nChoose an action below:"
+            text = "🛠 <b>ADMIN PANEL</b>\n\nChoose an action below:"
             await safe_edit(query, text=text, reply_markup=get_admin_panel_keyboard(), parse_mode="HTML")
 
         else:
@@ -4332,9 +4331,9 @@ async def global_error_handler(update: object, context: ContextTypes.DEFAULT_TYP
 
 async def main():
     banner = r"""
-â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
-â•‘   KARANPAY WALLET BOT â€” STARTING UP            â•‘
-â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+╔══════════════════════════════════════════════╗
+║   KARANPAY WALLET BOT — STARTING UP            ║
+╚══════════════════════════════════════════════╝
 """
     try:
         import sys
