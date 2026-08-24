@@ -1,8 +1,6 @@
-﻿python-telegram-bot[job-queue]==20.8
+python-telegram-bot[job-queue]==20.8
 pymongo==4.6.1
 requests==2.31.0
 aiohttp==3.9.3
 qrcode==7.4.2
 Pillow==10.2.0
-cloudscraper==1.2.71
-tls-client==1.0.1
