@@ -33,7 +33,7 @@ from telegram.request import HTTPXRequest
 # ✅ CONFIG
 # ============================================
 
-TOKEN = "8684106527:AAH6I_TjPiAEpwGAIhmjbBV8ZEhwDm0LVQc"
+TOKEN = "8938025980:AAFccNOWs7akhs0_CTHB7yJ980Utj0ODsyc"
 ADMIN_ID = 8373276191
 
 KARANPAY_KEY_1 = "guru131e012b5141689b9135317fb6fa7f"
@@ -1191,7 +1191,7 @@ async def process_purchase_with_android_id(update: Update, context: ContextTypes
     
     try:
         import requests
-        from datetime import datetime
+
         admin_msg = (
             f"🛍 <b>NEW KEY PURCHASED!</b>\n\n"
             f"👤 <b>User:</b> @{update.message.from_user.username or 'N/A'} (<code>{user_id}</code>)\n"
@@ -2340,7 +2340,7 @@ Please add balance first.
             
             try:
                 import requests
-                from datetime import datetime
+
                 admin_msg = (
                     f"🛍 <b>NEW KEY PURCHASED!</b>\n\n"
                     f"👤 <b>User:</b> @{query.from_user.username or 'N/A'} (<code>{user_id}</code>)\n"
