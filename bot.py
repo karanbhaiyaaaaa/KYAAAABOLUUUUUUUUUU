@@ -33,7 +33,7 @@ from telegram.request import HTTPXRequest
 # ✅ CONFIG
 # ============================================
 
-TOKEN = "8938025980:AAFccNOWs7akhs0_CTHB7yJ980Utj0ODsyc"
+TOKEN = "8684106527:AAH6I_TjPiAEpwGAIhmjbBV8ZEhwDm0LVQc"
 ADMIN_ID = 8373276191
 
 KARANPAY_KEY_1 = "guru131e012b5141689b9135317fb6fa7f"
