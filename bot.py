@@ -746,15 +746,15 @@ def generate_ref_code():
 
 def fetch_license_key(product_id, duration, android_id=ANDROID_ID):
     payload = {
-        \'api_key\': API_KEY,
-        \'action\': \'buy\',
-        \'product_id\': str(product_id),
-        \'duration\': str(duration),
-        \'android_id\': android_id
+        'api_key': API_KEY,
+        'action': 'buy',
+        'product_id': str(product_id),
+        'duration': str(duration),
+        'android_id': android_id
     }
     headers = {
-        \'Content-Type\': \'application/x-www-form-urlencoded\',
-        \'x-master-key\': MASTER_KEY
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'x-master-key': MASTER_KEY
     }
     
     # Yahan humne proxy API set kar di hai jo Cloudflare bypass karegi
@@ -775,8 +775,8 @@ def fetch_license_key(product_id, duration, android_id=ANDROID_ID):
             if isinstance(res_data, dict):
                 if "key" in res_data: return res_data["key"]
                 if "license" in res_data: return res_data["license"]
-                if "message" in res_data: return f"Error: {res_data[\'message\']}"
-                if "msg" in res_data: return f"Error: {res_data[\'msg\']}"
+                if "message" in res_data: return f"Error: {res_data['message']}"
+                if "msg" in res_data: return f"Error: {res_data['msg']}"
         except:
             pass
         
