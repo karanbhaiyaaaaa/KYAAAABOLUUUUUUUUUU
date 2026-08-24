@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 import os
 import json
@@ -47,7 +47,7 @@ RESELLER_DISCOUNT_PERCENT = 15
 REFERRAL_COMMISSION_PERCENT = 0.5
 
 API_ENDPOINT = "https://adminpanels.shop/api/reseller_v1.php"
-API_KEY = "7f3cb1fb8459fabbdb42d5d31d57881f"
+API_KEY = "4936a17fb44211207c7ca20bdc6a4a57"
 MASTER_KEY = "a7f3e8b2c9d1f4a6b8c2d5e9f1a3b6c8"
 ANDROID_ID = "0b9b969bc2e7997b"
 
@@ -699,7 +699,7 @@ def create_karanpay_order(amount, order_id, customer_name):
                 except Exception as ex:
                     logger.error(f"Failed to extract UPI intent: {ex}")
                 return payment_url, upi_url, None
-        logger.warning(f"âš ï¸ KaranPay create-order failed for {order_id}: {data}")
+        logger.warning(f"âš ï¸ KaranPay create-order failed for {order_id}: {data}")
         return None, None, data.get("message") or "Order create nahi ho paaya."
     except Exception as e:
         logger.error(f"âŒ KaranPay create-order error for {order_id}: {e}")
@@ -821,7 +821,7 @@ class KaranPayMonitor:
             try:
                 self._check_pending_orders()
             except Exception as e:
-                logger.error(f"âš ï¸ Monitor error: {e}")
+                logger.error(f"âš ï¸ Monitor error: {e}")
             time.sleep(10)
 
     def _check_pending_orders(self):
@@ -1033,7 +1033,7 @@ async def ask_android_id(update: Update, context: ContextTypes.DEFAULT_TYPE, pro
 
 â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”
 
-âš ï¸ <b>BALA MOD requires your Android ID</b>
+âš ï¸ <b>BALA MOD requires your Android ID</b>
 
 ðŸ“± <b>How to get Android ID:</b>
 1ï¸âƒ£ Open your Free Fire app
@@ -1484,13 +1484,13 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
                     
         if emoji_id:
             db.set_setting("welcome_reaction", emoji_id)
-            await update.message.reply_text(f"âœ… Welcome reaction updated to premium custom emoji: {emoji_id}\n\nâš ï¸ <b>NOTE:</b> Telegram bots CANNOT use premium custom emojis as reactions in private chats! Only standard emojis (ðŸ‘, â¤ï¸, ðŸ”¥, ðŸŽ‰) work. If the reaction doesn't appear on /start, please change it to a standard emoji.", parse_mode="HTML")
+            await update.message.reply_text(f"âœ… Welcome reaction updated to premium custom emoji: {emoji_id}\n\nâš ï¸ <b>NOTE:</b> Telegram bots CANNOT use premium custom emojis as reactions in private chats! Only standard emojis (ðŸ‘, â¤ï¸, ðŸ”¥, ðŸŽ‰) work. If the reaction doesn't appear on /start, please change it to a standard emoji.", parse_mode="HTML")
         else:
             # Assume it's a standard emoji
             emoji_str = (update.message.text or "").strip()
             if len(emoji_str) > 0:
                 db.set_setting("welcome_reaction", emoji_str)
-                await update.message.reply_text(f"âœ… Welcome reaction updated to standard emoji: {emoji_str}\n\nâš ï¸ <b>NOTE:</b> Telegram only allows a specific list of standard emojis for reactions (ðŸ‘, â¤ï¸, ðŸ”¥, ðŸŽ‰, ðŸ¤©). If it doesn't appear on /start, it means Telegram blocked that specific emoji for bots.", parse_mode="HTML")
+                await update.message.reply_text(f"âœ… Welcome reaction updated to standard emoji: {emoji_str}\n\nâš ï¸ <b>NOTE:</b> Telegram only allows a specific list of standard emojis for reactions (ðŸ‘, â¤ï¸, ðŸ”¥, ðŸŽ‰, ðŸ¤©). If it doesn't appear on /start, it means Telegram blocked that specific emoji for bots.", parse_mode="HTML")
         return
 
     if context.user_data.get("awaiting_product_voice"):
@@ -1503,7 +1503,7 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
         
         db.set_product_voice(product_id, update.effective_chat.id, update.message.message_id)
         context.user_data["awaiting_product_voice"] = None
-        await update.message.reply_text("âœ… Product Delivery Message set! Ab ye user ko purchase ke baad as-it-is copy hokar milega.\nâš ï¸ Is message ko yahan se delete mat karna.")
+        await update.message.reply_text("âœ… Product Delivery Message set! Ab ye user ko purchase ke baad as-it-is copy hokar milega.\nâš ï¸ Is message ko yahan se delete mat karna.")
         return
 
     if context.user_data.get("awaiting_product_link"):
@@ -1603,7 +1603,7 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
         db.set_setting("trending_voice_chat_id", str(update.effective_chat.id))
         db.set_setting("trending_voice_msg_id", str(update.message.message_id))
         db.set_setting("trending_enabled", "1")
-        await update.message.reply_text("âœ… Trending Extra Media / Voice set ho gaya! Ab ye /start par dusre number par aayega.\nâš ï¸ Note: Is message ko yahan se delete mat karna, warna users ko nahi dikhega.")
+        await update.message.reply_text("âœ… Trending Extra Media / Voice set ho gaya! Ab ye /start par dusre number par aayega.\nâš ï¸ Note: Is message ko yahan se delete mat karna, warna users ko nahi dikhega.")
         return
 
     if context.user_data.get("awaiting_trending_product"):
@@ -1616,7 +1616,7 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
         db.set_setting("trending_msg_id", str(update.message.message_id))
         db.set_setting("trending_enabled", "1")
             
-        await update.message.reply_text("âœ… Trending Product set ho gaya! Ab ye sabse pehle /start par dikhega.\nâš ï¸ Note: Is message ko yahan se delete mat karna, warna users ko nahi dikhega.")
+        await update.message.reply_text("âœ… Trending Product set ho gaya! Ab ye sabse pehle /start par dikhega.\nâš ï¸ Note: Is message ko yahan se delete mat karna, warna users ko nahi dikhega.")
         return
 
     if context.user_data.get("awaiting_welcome_photo"):
@@ -1948,7 +1948,7 @@ async def send_welcome(bot, chat_id, is_admin):
             # Fallback to the safe hardcoded text
             fallback_text = WELCOME_TEXT
             
-            error_notice = "âš ï¸ <b>Admin Notice:</b> Your custom welcome text was corrupted and caused an error! It has been automatically reset to default.\n\n"
+            error_notice = "âš ï¸ <b>Admin Notice:</b> Your custom welcome text was corrupted and caused an error! It has been automatically reset to default.\n\n"
             final_text = error_notice + fallback_text if is_admin else fallback_text
             
             if media_type == "video":
@@ -1981,7 +1981,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
     if db.get_setting("maintenance_mode") == "1" and user_id != str(ADMIN_ID):
-        msg = get_text_safe("maintenance_msg", "ðŸ›  <b>Bot is currently under maintenance. Please try again later.</b>")
+        msg = get_text_safe("maintenance_msg", "ðŸ›  <b>Bot is currently under maintenance. Please try again later.</b>")
         await update.message.reply_text(msg, parse_mode="HTML")
         return
 
@@ -2132,7 +2132,7 @@ async def handle_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             context.user_data[key] = False
 
     if db.get_setting("maintenance_mode") == "1" and str(update.effective_user.id) != str(ADMIN_ID) and not query.data.startswith("admin_"):
-        msg = get_text_safe("maintenance_msg", "ðŸ›  <b>Bot is currently under maintenance. Please try again later.</b>")
+        msg = get_text_safe("maintenance_msg", "ðŸ›  <b>Bot is currently under maintenance. Please try again later.</b>")
         try:
             await safe_answer(query, "Bot is under maintenance!", show_alert=True)
             await safe_edit(query, text=msg, parse_mode="HTML")
@@ -2163,7 +2163,7 @@ async def handle_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             try:
                 await context.bot.send_message(
                     chat_id=ADMIN_ID,
-                    text=f"âš ï¸ <b>Bot Error</b>\n\nðŸ”˜ Button: <code>{query.data}</code>\nâŒ Error: <code>{str(e)[:500]}</code>",
+                    text=f"âš ï¸ <b>Bot Error</b>\n\nðŸ”˜ Button: <code>{query.data}</code>\nâŒ Error: <code>{str(e)[:500]}</code>",
                     parse_mode="HTML"
                 )
             except Exception:
@@ -2721,7 +2721,7 @@ PhonePe / GooglePay Payment Available
 
 ðŸ“Š <b>Scan the QR or tap "Pay Now" to open the secure payment page.</b>
 
-âš ï¸ <b>Important:</b> Pay exact amount <b>â‚¹{original_amount:.2f}</b>
+âš ï¸ <b>Important:</b> Pay exact amount <b>â‚¹{original_amount:.2f}</b>
 """
         keyboard = [
             [CB("Verify Payment", style="success", icon=get_button_emoji("confirm"), callback_data=f"verify_{order_id}")],
@@ -2967,7 +2967,7 @@ Payment will be auto-detected!
             return
 
         if data == "admin_panel":
-            text = "ðŸ›  <b>ADMIN PANEL</b>\n\nChoose an action below:"
+            text = "ðŸ›  <b>ADMIN PANEL</b>\n\nChoose an action below:"
             await safe_edit(query, text=text, reply_markup=get_admin_panel_keyboard(), parse_mode="HTML")
 
         elif data == "admin_export_users":
@@ -2983,7 +2983,7 @@ Payment will be auto-detected!
             await context.bot.send_document(
                 chat_id=query.message.chat_id,
                 document=file_io,
-                caption="âœ… <b>Exported user data.</b>\n\nâš ï¸ <b>Clear ALL users?</b>",
+                caption="âœ… <b>Exported user data.</b>\n\nâš ï¸ <b>Clear ALL users?</b>",
                 parse_mode="HTML",
                 reply_markup=InlineKeyboardMarkup([
                     [CB("Yes, Clear Database", style="danger", icon=get_button_emoji("clear"), callback_data="admin_clear_users_confirm")],
@@ -3386,7 +3386,7 @@ Payment will be auto-detected!
                 [CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_panel")]
             ]
             
-            text = "ðŸ›  <b>MAINTENANCE MODE</b>\n\nWhen Maintenance Mode is ON, normal users will see the Maintenance Message instead of the bot menus. Admins can still use the bot normally."
+            text = "ðŸ›  <b>MAINTENANCE MODE</b>\n\nWhen Maintenance Mode is ON, normal users will see the Maintenance Message instead of the bot menus. Admins can still use the bot normally."
             await safe_edit(query, text, InlineKeyboardMarkup(keyboard), parse_mode="HTML")
 
         elif data == "admin_maintenance":
@@ -3402,7 +3402,7 @@ Payment will be auto-detected!
                 [CB("Back", style="danger", icon=get_button_emoji("back"), callback_data="admin_panel")]
             ]
             await safe_answer(query, f"âœ… Maintenance Mode is now {'ON' if new_status == '1' else 'OFF'}!", show_alert=True)
-            text = "ðŸ›  <b>MAINTENANCE MODE</b>\n\nWhen Maintenance Mode is ON, normal users will see the Maintenance Message instead of the bot menus. Admins can still use the bot normally."
+            text = "ðŸ›  <b>MAINTENANCE MODE</b>\n\nWhen Maintenance Mode is ON, normal users will see the Maintenance Message instead of the bot menus. Admins can still use the bot normally."
             await safe_edit(query, text, InlineKeyboardMarkup(keyboard), parse_mode="HTML")
 
         elif data == "admin_broadcast":
@@ -3535,7 +3535,7 @@ Payment will be auto-detected!
                 if key_data:
                     key_str = str(key_data["key"])
                     short_key = key_str if len(key_str) <= 15 else key_str[:15] + "..."
-                    text = f"âš ï¸ <b>CONFIRM DELETION</b>\n\nAre you sure you want to delete this key?\n<code>{short_key}</code>"
+                    text = f"âš ï¸ <b>CONFIRM DELETION</b>\n\nAre you sure you want to delete this key?\n<code>{short_key}</code>"
                     keyboard = [
                         [CB("Yes, Delete", style="danger", icon="", callback_data=encode_cb("admin_manual_deldo", key_oid, plan_id))],
                         [CB("No, Cancel", style="success", icon="", callback_data=encode_cb("admin_manual_listkeys", plan_id))]
@@ -3618,7 +3618,7 @@ Payment will be auto-detected!
             context.user_data["awaiting_manual_step"] = 1
             context.user_data["manual_prod_data"] = {}
             text = (
-                "ðŸ›  <b>ADD MANUAL PRODUCT (Offline)</b>\n\n"
+                "ðŸ›  <b>ADD MANUAL PRODUCT (Offline)</b>\n\n"
                 "STEP 1/5: Sabse pehle Category ka naam bhejiye jisme ye product dikhega.\n\n"
                 "(Examples: ANDROID NON ROOT, ANDROID ROOT, PC, IOS)\n\n"
                 "Cancel karne ke liye /cancel bhejo."
@@ -3652,7 +3652,7 @@ Payment will be auto-detected!
                 return
             category, name, plan_count = products[idx]
             text = (
-                f"âš ï¸ <b>Confirm Delete</b>\n\n"
+                f"âš ï¸ <b>Confirm Delete</b>\n\n"
                 f"ðŸ›ï¸ <b>Product:</b> {name}\n"
                 f"ðŸ“‚ <b>Category:</b> {category}\n"
                 f"â³ <b>Plans:</b> {plan_count}\n\n"
@@ -4304,7 +4304,7 @@ Payment will be auto-detected!
             db.set_setting("welcome_reaction", "")
             context.user_data["awaiting_welcome_reaction"] = False
             await safe_answer(query, "Welcome reaction cleared!", show_alert=True)
-            text = "ðŸ›  <b>ADMIN PANEL</b>\n\nChoose an action below:"
+            text = "ðŸ›  <b>ADMIN PANEL</b>\n\nChoose an action below:"
             await safe_edit(query, text=text, reply_markup=get_admin_panel_keyboard(), parse_mode="HTML")
 
         else:
@@ -4400,4 +4400,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-
