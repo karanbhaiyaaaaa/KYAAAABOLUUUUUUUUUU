@@ -8,3 +8,5 @@ Pillow
 cloudscraper
 
 aiohttp
+tls_client
+typing_extensions
