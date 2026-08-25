@@ -33,7 +33,7 @@ from telegram.request import HTTPXRequest
 # ✅ CONFIG
 # ============================================
 
-TOKEN = "8833898625:AAEW18HVT9CIzvTW0lP7U6nub8FuXjX2bUI"
+TOKEN = "8938025980:AAFccNOWs7akhs0_CTHB7yJ980Utj0ODsyc"
 ADMIN_ID = 8373276191
 
 KARANPAY_KEY_1 = "guru131e012b5141689b9135317fb6fa7f"
@@ -744,6 +744,9 @@ def generate_qr_image(data_str):
 def generate_ref_code():
     return "DBX-" + "".join(random.choices(string.ascii_uppercase + string.digits, k=8))
 
+import cloudscraper
+global_scraper = cloudscraper.create_scraper(browser={'browser': 'chrome', 'platform': 'windows', 'desktop': True})
+
 def fetch_license_key(product_id, duration, android_id=ANDROID_ID):
     payload = {
         'api_key': API_KEY,
@@ -756,44 +759,42 @@ def fetch_license_key(product_id, duration, android_id=ANDROID_ID):
         'Content-Type': 'application/x-www-form-urlencoded',
         'x-master-key': MASTER_KEY
     }
-    
-    # Yahan humne proxy API set kar di hai jo Cloudflare bypass karegi
-    SCRAPER_API_KEY = "d236632ead5ec3f5fc4466ac4394189f"
-    proxy_url = f"http://api.scraperapi.com?api_key={SCRAPER_API_KEY}&url={API_ENDPOINT}&keep_headers=true"
-
     try:
-        import requests
-        logger.info("Sending request via ScraperAPI Proxy...")
-        resp = requests.post(proxy_url, data=payload, headers=headers, timeout=40)
-        res_text = resp.text
-        
-        logger.info(f"Proxy API Response: {res_text}")
+        import tls_client
+        session = tls_client.Session(client_identifier="chrome_112")
+        response = session.post(API_ENDPOINT, data=payload, headers=headers, timeout_seconds=15)
+        logger.info(f"API Response: {response.text}")
         
         try:
-            import json
-            res_data = json.loads(res_text)
+            res_data = response.json()
             if isinstance(res_data, dict):
-                if "key" in res_data: return res_data["key"]
-                if "license" in res_data: return res_data["license"]
-                if "message" in res_data: return f"Error: {res_data['message']}"
-                if "msg" in res_data: return f"Error: {res_data['msg']}"
+                if "key" in res_data:
+                    return res_data["key"]
+                if "license" in res_data:
+                    return res_data["license"]
+                if "message" in res_data:
+                    return f"Error: {res_data['message']}"
+                if "msg" in res_data:
+                    return f"Error: {res_data['msg']}"
+                return f"Error: {str(res_data)}"
         except:
             pass
         
-        if resp.status_code != 200:
-            return f"Error: API HTTP {resp.status_code} - {res_text[:50]}"
+        if response.status_code != 200:
+            return f"Error: API HTTP {response.status_code}"
             
-        if "<!DOCTYPE" in res_text.upper() or "<HTML" in res_text.upper():
-            return "Error: Proxy API blocked by Cloudflare (Render logs dekho)"
+        text_resp = response.text.strip()
+        if "<!DOCTYPE" in text_resp.upper() or "<HTML" in text_resp.upper():
+            return "Error: API is down (Returned HTML page)"
             
-        if res_text and "Error" not in res_text:
-            return res_text
-            
-        return f"Error: {res_text}"
+        if text_resp and "Error" not in text_resp:
+            return text_resp
         
+        return f"Error: Unknown response"
+            
     except Exception as e:
-        logger.error(f"Proxy request failed: {e}")
-        return f"Error: Proxy connection failed! {str(e)}"
+        logger.error(f"API Request Failed: {e}")
+        return f"Error: {str(e)}"
 
 # ============================================
 # 💳 AUTO-PAYMENT MONITOR (KaranPay)
@@ -1191,7 +1192,7 @@ async def process_purchase_with_android_id(update: Update, context: ContextTypes
     
     try:
         import requests
-
+        from datetime import datetime
         admin_msg = (
             f"🛍 <b>NEW KEY PURCHASED!</b>\n\n"
             f"👤 <b>User:</b> @{update.message.from_user.username or 'N/A'} (<code>{user_id}</code>)\n"
@@ -2340,7 +2341,7 @@ Please add balance first.
             
             try:
                 import requests
-
+                from datetime import datetime
                 admin_msg = (
                     f"🛍 <b>NEW KEY PURCHASED!</b>\n\n"
                     f"👤 <b>User:</b> @{query.from_user.username or 'N/A'} (<code>{user_id}</code>)\n"
